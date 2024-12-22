@@ -156,7 +156,7 @@ db = SqliteDatabase("path/to/database_file")
 ## Views
 Views are functions that handle specific requests. It can send any python object over the network, meaning that the client will receive the exact thing the view function returns, you can literally send an AI model with this if you want.
 
-Example login view:
+Example signup view from "views.py":
 
 ```python
 def signup(request):
