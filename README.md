@@ -38,7 +38,7 @@ server = run_server(AsyncServer(
 ))
 ```
 
-Fluxon.Endpoint.AsyncServer is a versatile, robust, and flexiable session-based server infrastructure that supports asynchronous connections, which is the best option for most server setups
+Fluxon.Endpoint.AsyncServer is a versatile, robust, and flexiable session-based server infrastructure that supports asynchronous connections and reverse requests, which is the best option for most server setups
 
 ### Router Setup
 The `Router` handles all incoming requests and maps them to appropriate views.
@@ -171,6 +171,8 @@ Fluxon provides a ConnectionHandler for managing client-server communication.
 
 ### Setting Up a Client
 
+You can use this on the client side of the app, it manages sessions and socket connections automatically, and organizes the request send and receive process. the code also keeps an open socket holding the same session id for a reversed requests (from the server to the client) it allows for multiple requests for the same session at the time, which is cool
+
 ```python
 from Fluxon.Connect import ConnectionHandler
 
@@ -179,12 +181,6 @@ conn = ConnectionHandler(host="127.0.0.1", port=8080)
 # Example request
 response = conn.send_request("signup", {"username": "test", "password": "test123"})
 print(response)
-Features
-Routing
-Map request paths to specific view functions for organized request handling.
-
-Secure Communication
-Uses session-based authentication secured by a private key.
 ```
 
 ## Running the Server
