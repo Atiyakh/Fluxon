@@ -14,7 +14,7 @@ Fluxon is a lightweight Python backend framework that simplifies backend develop
 
 ## Installation
 
-1. Just Clone the repository to your local machine and you should be good to go:
+- **Just Clone the repository to your local machine and you should be good to go:**
     ```bash
     git clone https://github.com/your-username/fluxon.git
     ```
