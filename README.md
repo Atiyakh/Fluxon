@@ -38,6 +38,8 @@ server = run_server(AsyncServer(
 ))
 ```
 
+Fluxon.Endpoint.AsyncServer is a versatile, robust, and flexiable session-based server infrastructure that supports asynchronous connections, which is the best option for most server setups
+
 ### Router Setup
 The `Router` handles all incoming requests and maps them to appropriate views.
 
@@ -139,7 +141,7 @@ db = SqliteDatabase("path/to/database_file")
 - **Querying Data:**
   
   ```python
-  users = db.User.Chech(db.where[db.User.username == "name"], fetch=number_of_results)
+  users = db.User.Check(db.where[db.User.username == "name"], fetch=number_of_results)
   ```
   
   you can also drop the fetch argument to get all the data filtered by the where statement
