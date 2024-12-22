@@ -33,21 +33,41 @@ Fluxon is a lightweight Python backend framework that simplifies backend develop
 
 ## Getting Started
 
+## Setting up The Server
+Setting up the server is pretty simple. First you pick your favorite server from Fluxon.Endpoint, let's say you happened to choose AsyncServer as your main Endpoint for the server (which is the only one avaliable right now, more on the way tho)
+
+write this in your "server.py"
+```python
+from Fluxon.Endpoint import AsyncServer, run_server
+import router
+
+server = run_server(AsyncServer(
+    port=8080, secure=False,
+    router=router.router
+))
+```
+
 ### Router Setup
 The `Router` handles all incoming requests and maps them to appropriate views.
 
+and this is "router.py" that we used in "server.py"
 ```python
 from Fluxon.Routing import Router
-import views, models
+import models, views
+
+SERVER_SECURITY_KEY = "RsxZd5wVVml7C0H_LrbIVTDJU9kR-NwS1UxWD2lTVdY"
+DATABASE_SCHEMA_DIR = "path/to/database_schema"
+DATABASE_PATH = "path/to/database.sqlite3"
 
 router = Router(
+    # routing setup
     mapping={
-        "login": views.login,
         "signup": views.signup
     },
-    private_key="your-private-key",
-    database_schema_dir="path/to/schema",
-    database_path="path/to/database.sqlite3",
+    # server setup
+    private_key=SERVER_SECURITY_KEY,
+    database_schema_dir=DATABASE_SCHEMA_DIR,
+    database_path=DATABASE_PATH,
     models=models
 )
 ```
