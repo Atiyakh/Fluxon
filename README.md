@@ -1,6 +1,6 @@
 # Fluxon
 
-Fluxon is a lightweight Python backend framework that simplifies backend development. It offers routing, secure communication, session handling, and database management, making it an excellent choice for building server-side applications.
+Fluxon is a lightweight python-based general-purpose network engine. It offers routing, secure communication, session handling, and database management, making it an excellent choice for building server-side applications.
 
 ---
 
