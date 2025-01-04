@@ -17,7 +17,7 @@ Fluxon is a lightweight python-based general-purpose network engine. It offers r
 - **Just Clone the repository to your local machine and you should be good to go:**
 
     ```bash
-    git clone https://github.com/your-username/fluxon.git
+    git clone https://github.com/AtiyaKh/fluxon.git
     ```
 
 ---
@@ -111,7 +111,7 @@ Once the models are defined, you can save the schema, which Fluxon will translat
 saving schema is straightforward, type ```saveschema``` in the interactive server console, and the modles you wrote will be automatically saved, loading that schema involved typeing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
 
 ### 3. **Data Manipulation**
-Once the schema is set, Fluxon allows you to easily manipulate your data using the Fluxon.Database.Manipulations.SqliteDatabase object, which is responsible for performing CRUD (Create, Read, Update, Delete) operations on your SQLite database.
+Once the schema is set, Fluxon allows you to easily manipulate your data using the ```Fluxon.Database.Manipulations.SqliteDatabase``` object, which is responsible for performing CRUD (Create, Read, Update, Delete) operations on your SQLite database.
 
 ```python
 from Fluxon.Database.Manipulation import SqliteDatabase
@@ -144,13 +144,13 @@ db = SqliteDatabase("path/to/database_file")
   users = db.User.Check(db.where[db.User.username == "name"], fetch=number_of_results)
   ```
   
-  you can also drop the fetch argument to get all the data filtered by the where statement
+  you can also drop the fetch argument to get all the data filtered using where statement
 
 
 - **Deleting Data:**
   
   ```python
-  db.User.Delete(User, where[db.User.id == 3])
+  db.User.Delete(where[db.User.id == 3])
   ```
 
 ## Views
@@ -171,7 +171,7 @@ Fluxon provides a ConnectionHandler for managing client-server communication.
 
 ### Setting Up a Client
 
-You can use this on the client side of the app, it manages sessions and socket connections automatically, and organizes the request send and receive process. the code also keeps an open socket holding the same session id for a reversed requests (from the server to the client) it allows for multiple requests for the same session at the time, which is cool
+You can use this on the client side of your application, it manages sessions and socket connections automatically, and organizes the request send and receive process. the code also keeps an open socket holding the same session id for a reversed requests (from the server to the client) it allows for multiple requests for the same session at the time, which is cool
 
 ```python
 from Fluxon.Connect import ConnectionHandler
