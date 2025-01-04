@@ -167,11 +167,11 @@ def signup(request):
 The request passed to the view is a Fluxon.Routing.Request object that contains the client's peername, session id, user id, the request payload, the connection object used by the server, and all the data you need. All the Requests passed are authenticated, you can authorize users (bind then to a user, which is supposed to be an Model.AuthorizedUser sub-class) user requests.login(user_id)
 
 ## Client Interaction
-Fluxon provides a ConnectionHandler for managing client-server communication.
+Fluxon provides high-level class ```ConnectionHandler``` for managing client-side communication.
 
 ### Setting Up a Client
 
-You can use this on the client side of your application, it manages sessions and socket connections automatically, and organizes the request send and receive process. the code also keeps an open socket holding the same session id for a reversed requests (from the server to the client) it allows for multiple requests for the same session at the time, which is cool
+You can use this on the client side of your application, it manages sessions and socket connections automatically, and organizes the request send and receive process. It also keeps an open socket holding the same session id for a reversed requests (from the server to the client) it allows for multiple requests for the same session at the time, which is cool
 
 ```python
 from Fluxon.Connect import ConnectionHandler
