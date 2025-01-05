@@ -64,6 +64,8 @@ class ConnectionHandler:
                 self.establish_connection()
 
     def receiver(self):
+        # establish connection
+        self.establish_connection()
         while True:
             if not self.main_sock:
                 self.establish_connection()
@@ -113,8 +115,6 @@ class ConnectionHandler:
         self.port = port
         self.is_response = False
         self.response_ = None
-        # establish connection
-        self.establish_connection()
         # keep connection alive
         thread = threading.Thread(target=self.receiver)
         thread.start()
