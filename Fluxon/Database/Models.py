@@ -243,7 +243,8 @@ class DecimalField(Field):
 
 class BooleanField(Field):
     def __init__(self, default:bool=None, null:bool=False):
-        self.primary_keys = False
+        self.primary_key = False
+        self.unique = False
         if default == None:
             self.default == None
         elif default in (True, False):
@@ -429,15 +430,26 @@ class ForeignKey(Field):
         else:
             self.default = default
             self._default = True
-        if to_table.__base__ in (Model, AuthorizedUser):
-            self.to_table = to_table
-        else: raise TypeError(
-            "Invalid to_table: to_table should be a Model"
-        )
+        if isinstance(to_table, str):
+            self.REFER = to_table
+        else:
+            if to_table.__base__ in (Model, AuthorizedUser):
+                self.to_table = to_table
+            else: raise TypeError(
+                "Invalid to_table: to_table should be a Model"
+            )
         if issubclass(on_delete.__class__, OnDelete):
             self.on_delete = on_delete
         else: raise TypeError(
             "Invalid on_delete: on_delete should be an OnDelete object (CASCADE, PROTECT, SET_NULL, SET_DEFAULT, or NO_ACTION)"
+        )
+
+    def resolve_string_reference(self, models_instances):
+        to_table = models_instances[self.REFER]
+        if to_table.__class__.__base__ in (Model, AuthorizedUser):
+            self.to_table = to_table.__class__
+        else: raise TypeError(
+            "Invalid to_table: to_table should be a Model"
         )
 
 class OneToOneField(Field):
