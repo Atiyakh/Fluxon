@@ -4,8 +4,8 @@ import traceback
 import threading
 import time
 
-def content_length(num):
-    return ("0"*(5-len(str(num)))+str(num)).encode()
+def content_length(num, padding=5):
+    return ("0"*(padding-len(str(num)))+str(num)).encode()
 
 class ConnectionHandler:
     def receive_package(self, buffer_size_limit:int=65536, timeout:int=120, sock=None):
@@ -49,7 +49,7 @@ class ConnectionHandler:
             except (ConnectionAbortedError, ConnectionError, ConnectionRefusedError, ConnectionResetError):
                 print("[Establish_Connection] Failed to connect with the server; re-establish connection in one second")
                 time.sleep(1)
-                return self.establish_connection()
+                return self.establish_connection(dump)
         else:
             try:
                 self.main_sock = socket(AF_INET, SOCK_STREAM)
@@ -64,8 +64,6 @@ class ConnectionHandler:
                 self.establish_connection()
 
     def receiver(self):
-        # establish connection
-        self.establish_connection()
         while True:
             if not self.main_sock:
                 self.establish_connection()
@@ -95,7 +93,7 @@ class ConnectionHandler:
         except:
             traceback.print_exc()
 
-    def send_request(self, view, data):
+    def send_request(self, view, data=b''):
         try:
             serialized_data = pickle.dumps(data)
             message = f"{view}|{self.sessionid}|".encode()+serialized_data
@@ -115,6 +113,78 @@ class ConnectionHandler:
         self.port = port
         self.is_response = False
         self.response_ = None
+        # establish connection
+        self.establish_connection()
         # keep connection alive
         thread = threading.Thread(target=self.receiver)
         thread.start()
+
+class CloudStorageConnector:
+    def establish_connection(self):
+        try:
+            sock = socket(AF_INET, SOCK_STREAM)
+            sock.connect((self.host, self.port))
+            print("[Establish_Connection] Connection Stable (DUMP)")
+            return sock
+        except (ConnectionAbortedError, ConnectionError, ConnectionRefusedError, ConnectionResetError):
+            print("[Establish_Connection] Failed to connect with the server; re-establish connection in one second")
+            time.sleep(1)
+            return self.establish_connection()
+
+    def recv_content(self, sock, content_length, buffer_size_limit=65536):
+        content_length_count = 0
+        chunks = []
+        while content_length > content_length_count:
+            chunk = sock.recv(min(buffer_size_limit, content_length - content_length_count))
+            chunks.append(chunk)
+            content_length_count += len(chunk)
+        return b''.join(chunks)
+
+    def send_request(self, cloud_request, sessionid, payload=b''):
+        cloud_path = cloud_request['cloud_path']
+        granted_operation = cloud_request['granted_operation'].num
+        try:
+            message = f"{cloud_path}|{sessionid}|".encode()+payload
+            sock = self.establish_connection()
+            sock.send(content_length(len(message), padding=10)+message)
+            if granted_operation in [0, 1, 2]: # create folder/write file/delete item
+                response = sock.recv(1024).decode()
+                return response
+            elif granted_operation == 3: # read file
+                try:
+                    chunk = sock.recv(10)
+                    if len(chunk) == 10:
+                        content_length_, file_data = chunk[:10], chunk[10:]
+                        if content_length_.isdigit():
+                            content_length_ = int(content_length_) - len(file_data)
+                            return file_data + self.recv_content(sock, content_length_)
+                        else:
+                            return False
+                    else:
+                        return False
+                except:
+                    traceback.print_exc()
+                    return False
+            elif granted_operation == 4: # read tree
+                try:
+                    chunk = sock.recv(10)
+                    if len(chunk) == 10:
+                        content_length_, file_data = chunk[:10], chunk[10:]
+                        if content_length_.isdigit():
+                            content_length_ = int(content_length_) - len(file_data)
+                            return pickle.loads(file_data + self.recv_content(sock, content_length_))
+                        else:
+                            return False
+                    else:
+                        return False
+                except:
+                    traceback.print_exc()
+                    return False
+            sock.close()
+        except:
+            traceback.print_exc()
+            print("[Send-Request] Unexpected error")
+
+    def __init__(self, host, port):
+        self.host = host
+        self.port = port
