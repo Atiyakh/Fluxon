@@ -95,12 +95,15 @@ class ModelsParser:
             for field_name, field in fields.items():
                 if isinstance(field, Models.ForeignKey):
                     foreigns.append(field_name)
+                    if not hasattr(field, 'to_table'):
+                        field.resolve_string_reference(self.models_instances)
                     foreigns_tables.append(field.to_table.__name__)
                 elif isinstance(field, Models.OneToOneField):
                     self.one_to_ones.append(field)
                     foreigns.append(field_name)
                     foreigns_tables.append(field.to_table.__name__)
                 self.foreigns[model_name] = foreigns
+                if model_name in foreigns_tables: foreigns_tables.remove(model_name)
                 self.foreigns_tables[model_name] = foreigns_tables
 
     def sqltype(self, field, remove_auto=False):
