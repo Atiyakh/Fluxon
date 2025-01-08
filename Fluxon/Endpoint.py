@@ -183,6 +183,8 @@ class Server:
                 self.cloud_storage.cloud_database = AsyncSQLiteDatabase(
                     self.router.database_path
                 )
+            else:
+                self.cloud_storage = None
         if isinstance(self, CloudStorageServer):
             self.cloud_folder = cloud_folder
     
