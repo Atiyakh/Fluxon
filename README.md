@@ -275,9 +275,9 @@ server = run_server(AsyncServer(
 ))
 ```
 
-This is the server setup, you will typically integrate your ```CloudStorageServer``` in the main server ```AsyncServer```.
+This server setup integrates your ```CloudStorageServer``` in your main server ```AsyncServer```. (I will elaborate more on different server setups when I make other custom endpoints)
 
-And ```router.py```
+And here's the code for ```router.py```
 
 ```python
 from Fluxon.Routing import Router
@@ -308,9 +308,9 @@ router = Router(
 )
 ```
 
-```cloud_models.py``` will collect the models for both servers and pass them to the router, and then the main server takes the models directly from the router.
+```cloud_models.py``` will collect the models for both servers and pass them to the router, and then the main server takes the models directly from the router to work with them. This way, the server can keep track of all your models and tables effectively.
 
-Here is a possible ```cloud_models.py``` setup, you can go super fancy with it if you want.
+Here is a possible ```cloud_models.py``` setup, you can go super fancy with it if you want. (I will write other sets of models for the cloud server and more operation flags for different operations in the future)
 
 ```python
 from Fluxon.Database import Models
@@ -342,7 +342,7 @@ class FileMetadata(Models.Model):
     last_accessed_at = Models.DateTimeField(auto_now=True)
 ```
 
-And here is a good start for ```views.py```
+And here is a good starting point for ```cloud_views.py```
 
 ```python
 from Fluxon.Database.Manipulations import AsyncSQLiteDatabase
@@ -378,7 +378,7 @@ async def create_owner(request):
         if rowid:
             username = (await async_db.User.Check(async_db.where[async_db.User.id == request.userid], fetch=1, columns=['username']))[0][0]
             request.grant_access(
-                granted_operation=request.cloud_operations.create_directory,
+                granted_operation=request.cloud_operations.create_directory, # as you can see operation flags are all encapsulated in the request itself for simplicity along side the basic `grant_access` authorization method. (inhanced access control features on the way!!)
                 cloud_relative_path=username
             )
             return {
