@@ -5,14 +5,15 @@ Fluxon is a lightweight python-based general-purpose network engine. It offers r
 ---
 
 ## Table of Contents
-1. [Installation](#installation)
-2. [Getting Started](#getting-started)
-3. [Features](#features)
-5. [License](#license)
+1. [Installation](##installation)
+2. [Getting Started](##getting-started)
+3. [Cloud Storage Setup]()
+4. [Features](##features)
+5. [License](##license)
 
 ---
 
-## Installation
+##Installation
 
 - **Just Clone the repository to your local machine and you should be good to go**
 
@@ -22,10 +23,10 @@ Fluxon is a lightweight python-based general-purpose network engine. It offers r
 
 ---
 
-## Getting Started
+##Getting Started
 
-### Setting up The Server
-Setting up the server is pretty simple. First you pick your favorite server from Fluxon.Endpoint, let's say you happened to choose AsyncServer as your main Endpoint for the server (which is the only one available right now, more on the way tho)
+###Setting up The Server
+Setting up the server is pretty simple. First you pick your favorite server from ```Fluxon.Endpoint```, let's say you happened to choose ```AsyncServer``` as your main Endpoint for the server (which is the only one available right now, more on the way tho)
 
 write this in your ```server.py```
 ```python
@@ -59,7 +60,7 @@ server = run_server(AsyncServer(
 ))
 ```
 
-### Router Setup
+###Router Setup
 The `Router` handles all incoming requests and maps them to appropriate views.
 
 and this is ```router.py``` that we used in ```server.py```
@@ -84,8 +85,8 @@ router = Router(
 )
 ```
 
-### Database Management
-#### Database Integration in Fluxon
+###Database Management
+####Database Integration in Fluxon
 
 Fluxon provides a seamless way to integrate a database with your application using an SQLite backend. The process is similar to Django’s ORM but with additional flexibility, allowing you to define models, manage schemas, and manipulate data easily. Here's a breakdown of the database workflow:
 
@@ -124,12 +125,12 @@ class Enrollment(Models.Model):
     date_enrolled = Models.DateField(auto_now_add=True)
 ```
 
-#### 2. **Saving and Updating Database Schema**
+####2. **Saving and Updating Database Schema**
 Once the models are defined, you can save the schema, which Fluxon will translate into SQL queries. These queries will be stored as ```.sql``` files in your defined schema directory. This translation ensures that your models are reflected as actual SQL tables in your database.
 
 saving schema is straightforward, type ```saveschema``` in the interactive server console, and the modles you wrote will be automatically saved, loading that schema involved typeing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
 
-#### 3. **Data Manipulation**
+####3. **Data Manipulation**
 Once the schema is set, Fluxon allows you to easily manipulate your data using the ```Fluxon.Database.Manipulations.SqliteDatabase``` object, which is responsible for performing CRUD (Create, Read, Update, Delete) operations on your SQLite database.
 
 ```python
@@ -203,7 +204,7 @@ async_db = AsyncSqliteDatabase("path/to/database_file")
   await db.User.Delete(where[db.User.id == 3])
   ```
 
-### Views
+###Views
 Views are functions that handle specific requests. It can send any python object over the network, meaning that the client will receive the exact thing the view function returns, you can literally send an AI model with this if you want.
 
 Example signup view from ```views.py```:
@@ -225,10 +226,10 @@ async def signup(request):
 
 The request passed to the view is a Fluxon.Routing.Request object that contains the client's peername, session id, user id, the request payload, the connection object used by the server, and all the data you need. All the Requests passed are authenticated, you can authorize users (bind then to a user, which is supposed to be a Model.AuthorizedUser sub-class) using requests.login(user_id)
 
-### Client Interaction
+###Client Interaction
 Fluxon provides high-level class ```ConnectionHandler``` for managing client-side communication.
 
-#### Setting Up a Client
+####Setting Up a Client
 
 You can use this on the client side of your application, it manages sessions and socket connections automatically, and organizes the request send and receive process. It also keeps an open socket holding the same session id for reverse requests (from the server to the client) it allows for multiple requests for the same session at the same time, which is dope for a higher-level connection interface.
 
@@ -242,7 +243,7 @@ response = conn.send_request("signup", {"username": "test", "password": "test123
 print(response)
 ```
 
-### Running the Server
+###Running the Server
 Start the server by running your routing configuration:
 
 ```bash
@@ -251,7 +252,7 @@ python server.py
 
 The server will automatically run an interactive console so you can interact directly with the server using the console, like updating the database schema, or terminating, debugging, etc....
 
-## Setting a Cloud Storage Server (optional; for complex server structures)
+##Setting a Cloud Storage Server (optional; for complex server structures)
 
 Now this might sound a little complicated, just follow along to get yourself a cloud server
 
@@ -615,7 +616,7 @@ cloud_response = cloud.send_request(cloud_request, conn.sessionid)
 
 ---
 
-## Features
+##Features
 
 - **Independent Server Architecture:** Fluxon is not tied to browser-based interaction, making it ideal for real-time and unconventional server setups.
 - **Simplified Reverse Requests:** Easily implement bidirectional communication without the complexity of WebSockets or low-level networking protocols.
@@ -629,34 +630,34 @@ cloud_response = cloud.send_request(cloud_request, conn.sessionid)
 
 ---
 
-## Why Choose Fluxon?
+##Why Choose Fluxon?
 
 Fluxon stands out from traditional frameworks like Django, Flask, or Twisted by offering a unique blend of flexibility, simplicity, and power for unconventional server architectures. Here's what makes Fluxon special:
 
-### 1. Independent of Browsers
+###1. Independent of Browsers
 - Unlike frameworks like Django, Fluxon is not tied to browser-based interaction.
 - This makes it ideal for applications requiring real-time or non-browser-based clients.
 
-### 2. Simplified Reverse Requests
+###2. Simplified Reverse Requests
 - Reverse requests are intuitive and easy to implement, eliminating the complexity of WebSockets or other low-level networking protocols.
 - Developers with limited networking expertise can still implement robust, real-time, bidirectional communication.
 
-### 3. Flexible Request Handling
+###3. Flexible Request Handling
 - Fluxon allows highly customizable request handling with minimal effort.
 - Define routes, map them to views, and integrate with asynchronous workflows to fit any server structure.
 
-### 4. Integrated Cloud Storage System
+###4. Integrated Cloud Storage System
 - Fluxon features a built-in cloud storage system, offering:
   - Server-side flexibility with robust authorization mechanisms.
   - Client-side simplicity for seamless integration.
 - No need for third-party storage systems—Fluxon’s solution is as easy to use as Django’s media system, but far more customizable.
 
-### 5. Perfect for Unconventional Server Architectures
+###5. Perfect for Unconventional Server Architectures
 - Fluxon thrives in environments where traditional frameworks fall short.
 - Its modular design makes setting up servers, routers, models, views, and cloud storage straightforward and adaptable.
 - Ideal for research-oriented, experimental, or highly customized applications.
 
 ---
 
-## License
+##License
 This project is licensed under the MIT License.
