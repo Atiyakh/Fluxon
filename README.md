@@ -27,7 +27,7 @@ Fluxon is a lightweight python-based general-purpose network engine. It offers s
 ## Getting Started
 
 ### Setting up The Server
-Setting up the server is pretty simple. First you pick your favorite server from ```Fluxon.Endpoint```, let's say you happened to choose ```AsyncServer``` as your main Endpoint for the server (which is the only one available right now, more on the way tho)
+Setting up the server is pretty simple. First you pick your favorite server from ```Fluxon.Endpoint```, let's say you happened to choose ```AsyncServer``` as your main Endpoint for your application (which is the only one available right now, more on the way tho)
 
 write this in your ```server.py```
 ```python
