@@ -598,7 +598,7 @@ response = conn.send_request("login", {
 file_to_upload = "path/to/file"
 cloud_relative_path = "username/path/to/file"
 
-# write_file returns a specifically tailored cloud request for your operation  
+# each cloud-related request returns a specifically tailored cloud request for your operation
 cloud_request = conn.send_request("write_file", {"path": cloud_relative_path})
 # redirect the request, coupled with the main server session_id, to perform different cloud operations
 with open(file_to_upload, 'rb') as file:
