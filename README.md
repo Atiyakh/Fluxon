@@ -14,7 +14,7 @@ Fluxon is a lightweight python-based general-purpose network engine. It offers r
 
 ## Installation
 
-- **Just Clone the repository to your local machine and you should be good to go:**
+- **Just Clone the repository to your local machine and you should be good to go**
 
     ```bash
     git clone https://github.com/AtiyaKh/fluxon.git
