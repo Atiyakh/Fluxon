@@ -138,7 +138,7 @@ from Fluxon.Database.Manipulation import SqliteDatabase
 db = SqliteDatabase("path/to/database_file")
 ```
 
-Or you can use ```AsyncSqliteDatabase``` for full I/O support and non-blocking flow. Asynchronous database handling requires writing asynchronous, which is not a bad idea by any means. This version uses connections pool to optimize database performace and avoid blocking. It also manages csoncurrent sql writings (setting ```check_same_thread``` to ```False```) without blocking the file.  
+Or you can use ```AsyncSqliteDatabase``` for full I/O support and non-blocking flow. Asynchronous database handling requires writing asynchronous views, which is not a bad idea by any means. This version uses connections pool to optimize database performace and avoid blocking. It also manages csoncurrent sql writings (setting ```check_same_thread``` to ```False```) without blocking the file.  
 
 ```python
 from Fluxon.Database.Manipulation import AsyncSqliteDatabase
