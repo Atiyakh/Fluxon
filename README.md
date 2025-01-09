@@ -578,7 +578,7 @@ async def read_tree(request):
     else: return "login required"
 ```
 
-The code sets the bases of how to authorize users to the cloud server. Use ```request.grant_access``` to authorize users to specific cloud operations, you can see the different flags for different operations like creating a folder, oe writing a file, etc...
+The code sets the bases of how to authorize users to the cloud server. Use ```request.grant_access``` to authorize users to specific cloud operations, you can see the different flags for different operations like creating a folder, or writing a file, etc...
 
 And here's how things look like on the client side
 
