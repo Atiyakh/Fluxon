@@ -126,6 +126,8 @@ class Enrollment(Models.Model):
     date_enrolled = Models.DateField(auto_now_add=True)
 ```
 
+| **```Models.AuthorizedUser``` can only be used once!**
+
 #### 2. **Saving and Updating Database Schema**
 Once the models are defined, you can save the schema, which Fluxon will translate into SQL queries. These queries will be stored as ```.sql``` files in your defined schema directory. This translation ensures that your models are reflected as actual SQL tables in your database.
 
@@ -171,13 +173,13 @@ async_db = AsyncSqliteDatabase("path/to/database_file")
 - **Updating Data:**
 
   ```python 
-  db.update(User, {db.User.email: "newemail@example.com"}, db.where[db.User.username == "filtering by username"])
+  db.User.Update({db.User.email: "newemail@example.com"}, db.where[db.User.username == "filtering by username"])
   ```
 
   And this is how an async version look like, just remember to write async views
 
   ```python 
-  await async_db.update(User, {db.User.email: "newemail@example.com"}, db.where[db.User.username == "filtering by username"])
+  await async_db.User.Update({db.User.email: "newemail@example.com"}, db.where[db.User.username == "filtering by username"])
   ```
 
   where accepts logical operators and ```&``` or ```|```
@@ -193,7 +195,6 @@ async_db = AsyncSqliteDatabase("path/to/database_file")
   ```
   
   you can also drop the fetch argument to get all the data filtered using where statement
-
 
 - **Deleting Data:**
   
@@ -225,7 +226,7 @@ async def signup(request):
     return {"status": "200", "message": "Signed up successfully"}
 ```
 
-The request passed to the view is a Fluxon.Routing.Request object that contains the client's peername, session id, user id, the request payload, the connection object used by the server, and all the data you need. All the Requests passed are authenticated, you can authorize users (bind then to a user, which is supposed to be a Model.AuthorizedUser sub-class) using requests.login(user_id)
+The request passed to the view is a ```Fluxon.Routing.Request``` object that contains the client's peername, session id, user id, the request payload, the connection object used by the server, and all the data you need. All requests passed are authenticated, you can authorize users (bind them to a user, which is supposed to be a Model.AuthorizedUser sub-class) using requests.login(user_id)
 
 ###Client Interaction
 Fluxon provides high-level class ```ConnectionHandler``` for managing client-side communication.
