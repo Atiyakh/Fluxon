@@ -48,7 +48,7 @@ You can also equip the server with a built-in highly-optimized cloud storage ser
 from Fluxon.Endpoint import AsyncServer, CloudStorageServer, run_server
 import router
 
-cloud_folder = r"C:\Users\skhodari\Desktop\TESTING\cloud_folder"
+cloud_folder = "/path/to/cloud_folder"
 
 server = run_server(AsyncServer(
     port=8080, secure=False,
@@ -265,7 +265,7 @@ from Fluxon.Endpoint import AsyncServer, CloudStorageServer, run_server
 import router
 
 # this is the base directory for your cloud server
-cloud_folder = r"C:\Users\skhodari\Desktop\TESTING\cloud_folder"
+cloud_folder = "/path/to/cloud_folder"
 
 server = run_server(AsyncServer(
     port=8080, secure=False,
@@ -288,8 +288,8 @@ import cloud_models
 import views
 
 SERVER_SECURITY_KEY = "RsxZd5wVVml7C0H_LrbIVTDJU9kR-NwS1UxWD2lTVdY"
-DATABASE_SCHEMA_DIR = r"C:\Users\skhodari\Desktop\TESTING\database_schema"
-DATABASE_PATH = r"C:\Users\skhodari\Desktop\TESTING\database.sqlite3"
+DATABASE_SCHEMA_DIR = "/path/to/database_schema"
+DATABASE_PATH = "/path/to/database.sqlite3"
 
 router = Router(
     # routing setup
@@ -351,8 +351,8 @@ And here is a good starting point for ```cloud_views.py```
 from Fluxon.Database.Manipulations import AsyncSQLiteDatabase
 import pathlib, os
 
-async_db = AsyncSQLiteDatabase(r"C:\Users\skhodari\Desktop\TESTING\database.sqlite3")
-cloud_folder = r"C:\Users\skhodari\Desktop\TESTING\cloud_folder"
+async_db = AsyncSQLiteDatabase("path/to/database.sqlite3")
+cloud_folder = "path/to/cloud_folder"
 
 async def signup(request):
     id = await async_db.User.Insert(request.payload)
