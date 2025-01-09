@@ -7,9 +7,9 @@ Fluxon is a lightweight python-based general-purpose network engine. It offers r
 ## Table of Contents
 1. [Installation](#installation)
 2. [Getting Started](#getting-started)
-3. [Cloud Storage Setup]()
-4. [Features](##features)
-5. [License](##license)
+3. [Cloud Storage Setup](#setting-a-cloud-storage-server-optional-for-complex-server-structures)
+4. [Features](#features)
+5. [License](#license)
 
 ---
 
