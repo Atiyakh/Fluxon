@@ -5,8 +5,8 @@ Fluxon is a lightweight python-based general-purpose network engine. It offers r
 ---
 
 ## Table of Contents
-1. [Installation](##installation)
-2. [Getting Started](##getting-started)
+1. [Installation](#installation)
+2. [Getting Started](#getting-started)
 3. [Cloud Storage Setup]()
 4. [Features](##features)
 5. [License](##license)
@@ -252,7 +252,7 @@ python server.py
 
 The server will automatically run an interactive console so you can interact directly with the server using the console, like updating the database schema, or terminating, debugging, etc....
 
-##Setting a Cloud Storage Server (optional; for complex server structures)
+## Setting a Cloud Storage Server (optional; for complex server structures)
 
 Now this might sound a little complicated, just follow along to get yourself a cloud server
 
