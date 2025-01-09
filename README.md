@@ -25,7 +25,7 @@ Fluxon is a lightweight python-based general-purpose network engine. It offers r
 ## Getting Started
 
 ## Setting up The Server
-Setting up the server is pretty simple. First you pick your favorite server from Fluxon.Endpoint, let's say you happened to choose AsyncServer as your main Endpoint for the server (which is the only one avaliable right now, more on the way tho)
+Setting up the server is pretty simple. First you pick your favorite server from Fluxon.Endpoint, let's say you happened to choose AsyncServer as your main Endpoint for the server (which is the only one available right now, more on the way tho)
 
 write this in your "server.py"
 ```python
@@ -38,7 +38,7 @@ server = run_server(AsyncServer(
 ))
 ```
 
-Fluxon.Endpoint.AsyncServer is a versatile, robust, and flexiable session-based server infrastructure that supports asynchronous connections and reverse requests, which is the best option for most server setups
+```Fluxon.Endpoint.AsyncServer``` is a robust, flexible server infrastructure supporting asynchronous connections and reverse requests, making it ideal for most server setups.
 
 You can also equip the server with a built-in highly-optimized cloud storage server, but it requires a complex setup and authorization mechanism. We'll talk about it in a second.
 
@@ -617,12 +617,44 @@ cloud_response = cloud.send_request(cloud_request, conn.sessionid)
 
 ## Features
 
-- **Routing:** Map request paths to specific view functions for organized request handling.
-- **Database Integration:** Use SQLite and define schemas for easy database management.
-- **Secure Sessions:** Session-based authentication secured with a private key.
-- **Python Object Serialization:** Easily send and receive complex Python objects using `pickle`.
-- **Session Management:** Manage persistent client-server communication.
-- **Cloud Storage Server:** built-in support for cloud storage.
+- **Independent Server Architecture:** Fluxon is not tied to browser-based interaction, making it ideal for real-time and unconventional server setups.
+- **Simplified Reverse Requests:** Easily implement bidirectional communication without the complexity of WebSockets or low-level networking protocols.
+- **Flexible Routing:** Intuitive mapping of request paths to view functions with support for asynchronous workflows, enabling seamless request handling.
+- **Integrated Cloud Storage System:** Built-in cloud storage support acts like a media system (e.g., Django) but with unparalleled flexibility and server-side authorization.
+- **Database Integration:** Use a Django-inspired ORM to define models and manage schemas with SQLite for streamlined database operations.
+- **Secure Sessions:** Session-based authentication secured with private keys for robust communication.
+- **Python Object Serialization:** Effortlessly send and receive complex Python objects using `pickle`.
+- **Session Management:** Manage persistent client-server connections with advanced session handling.
+- **Asynchronous Support:** Optimize performance with async-ready components for servers, databases, and views.
+
+---
+
+## Why Choose Fluxon?
+
+Fluxon stands out from traditional frameworks like Django, Flask, or Twisted by offering a unique blend of flexibility, simplicity, and power for unconventional server architectures. Here's what makes Fluxon special:
+
+### 1. Independent of Browsers
+- Unlike frameworks like Django, Fluxon is not tied to browser-based interaction.
+- This makes it ideal for applications requiring real-time or non-browser-based clients.
+
+### 2. Simplified Reverse Requests
+- Reverse requests are intuitive and easy to implement, eliminating the complexity of WebSockets or other low-level networking protocols.
+- Developers with limited networking expertise can still implement robust, real-time, bidirectional communication.
+
+### 3. Flexible Request Handling
+- Fluxon allows highly customizable request handling with minimal effort.
+- Define routes, map them to views, and integrate with asynchronous workflows to fit any server structure.
+
+### 4. Integrated Cloud Storage System
+- Fluxon features a built-in cloud storage system, offering:
+  - Server-side flexibility with robust authorization mechanisms.
+  - Client-side simplicity for seamless integration.
+- No need for third-party storage systems—Fluxon’s solution is as easy to use as Django’s media system, but far more customizable.
+
+### 5. Perfect for Unconventional Server Architectures
+- Fluxon thrives in environments where traditional frameworks fall short.
+- Its modular design makes setting up servers, routers, models, views, and cloud storage straightforward and adaptable.
+- Ideal for research-oriented, experimental, or highly customized applications.
 
 ---
 
