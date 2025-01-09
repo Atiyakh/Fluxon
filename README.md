@@ -27,7 +27,7 @@ Fluxon is a lightweight python-based general-purpose network engine. It offers r
 ### Setting up The Server
 Setting up the server is pretty simple. First you pick your favorite server from Fluxon.Endpoint, let's say you happened to choose AsyncServer as your main Endpoint for the server (which is the only one available right now, more on the way tho)
 
-write this in your "server.py"
+write this in your ```server.py```
 ```python
 from Fluxon.Endpoint import AsyncServer, run_server
 import router
@@ -62,7 +62,7 @@ server = run_server(AsyncServer(
 ### Router Setup
 The `Router` handles all incoming requests and maps them to appropriate views.
 
-and this is "router.py" that we used in "server.py"
+and this is ```router.py``` that we used in ```server.py```
 ```python
 from Fluxon.Routing import Router
 import models, views
@@ -206,7 +206,7 @@ async_db = AsyncSqliteDatabase("path/to/database_file")
 ### Views
 Views are functions that handle specific requests. It can send any python object over the network, meaning that the client will receive the exact thing the view function returns, you can literally send an AI model with this if you want.
 
-Example signup view from "views.py":
+Example signup view from ```views.py```:
 
 ```python
 def signup(request):
