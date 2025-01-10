@@ -158,59 +158,59 @@ async_db = AsyncSqliteDatabase("path/to/database_file")
 
 - **Inserting Data:**
 
-  ```python
-  db.User.Insert({
-      db.User.username: "username",
-      db.User.password: "password"
-  })
-  ```
+```python
+db.User.Insert({
+    db.User.username: "username",
+    db.User.password: "password"
+})
+```
 
-  And here is an example for an ```AsyncSqliteDatabase``` implementation:
+And here is an example for an ```AsyncSqliteDatabase``` implementation:
 
-  ```python
-  await async_db.User.Insert({
-      db.User.username: "username",
-      db.User.password: "password"
-  })
-  ```
+```python
+await async_db.User.Insert({
+    db.User.username: "username",
+    db.User.password: "password"
+})
+```
 
-  The ```Insert``` query should automatically return the id of the inserted row, returns ```False``` if it fails.
+The ```Insert``` query should automatically return the id of the inserted row, returns ```False``` if it fails.
 
 - **Updating Data:**
 
-  ```python 
-  db.User.Update({db.User.email: "newemail@example.com"}, db.where[db.User.username == "filtering by username"])
-  ```
+```python 
+db.User.Update({db.User.email: "newemail@example.com"}, db.where[db.User.username == "filtering by username"])
+```
 
-  And this is how an async version look like, just remember to write async views
+And this is how an async version look like, just remember to write async views
 
-  ```python 
-  await async_db.User.Update({db.User.email: "newemail@example.com"}, db.where[db.User.username == "filtering by username"])
-  ```
+```python 
+await async_db.User.Update({db.User.email: "newemail@example.com"}, db.where[db.User.username == "filtering by username"])
+```
 
-  where accepts logical operators and ```&``` or ```|```
+where statement accepts logical operators and ```&``` or ```|```
 
 - **Querying Data:**
   
-  ```python
-  users = db.User.Check(db.where[db.User.username == "name"], fetch=number_of_results)
-  ```
+```python
+users = db.User.Check(db.where[db.User.username == "name"], fetch=number_of_results)
+```
 
-  ```python
-  users = await async_db.User.Check(db.where[db.User.username == "name"], fetch=number_of_results)
-  ```
+```python
+users = await async_db.User.Check(db.where[db.User.username == "name"], fetch=number_of_results)
+```
   
-  you can also drop the fetch argument to get all the data filtered using where statement
+you can also drop the fetch argument to get all the data filtered using where statement
 
 - **Deleting Data:**
   
-  ```python
-  db.User.Delete(where[db.User.id == 3])
-  ```
+```python
+db.User.Delete(where[db.User.id == 3])
+```
 
-  ```python
-  await db.User.Delete(where[db.User.id == 3])
-  ```
+```python
+await db.User.Delete(where[db.User.id == 3])
+```
 
 Here is the thing tho, always add `await` before calling an asynchronous function, that way you're telling python to alternate between tasks and elemenate any I/O-related blocking 
 (what am I sayin, you gon do it either way. the system crashes without awaiting coroutines)
