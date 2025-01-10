@@ -262,7 +262,7 @@ print(response)
 
 ### Running the Server
 
-As we saw earlier, `run_server` from `Fluxon.Endpoint` is unironically responsible for running the server. Since we have already passed the server to `run_server` from the very beginning, you can literally run `server.py` to run the server—how easy!
+As we saw earlier, `run_server` from `Fluxon.Endpoint` is unironically responsible for running the server. Since we have already passed the server to `run_server` from the very beginning, you literally run `server.py` in order to run the server—how easy!
 
 ```bash
 python server.py
