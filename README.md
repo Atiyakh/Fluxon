@@ -269,6 +269,48 @@ The server will automatically run an interactive console so you can reach to the
 
 ### Reverse Requests
 
+A reverse request refers to a server-side request initiated by the server to trigger a function on the client side, mapped to a specific function name. You can use `request.server.reverse_request` to send a reverse request during runtime. This allows for dynamic client-server interactions, particularly useful for real-time applications.
+
+Below is an example of a real-time chat server utilizing reverse requests to send messages to clients:
+
+This is the view for sending a message and making a reverse request 
+```python
+async def send_message(request):
+    if request.userid:
+        sender = await db.User.Check(db.where[db.User.id == request.userid], fetch=1, columns=['username'])[0][0]
+        query = await db.User.Check(db.where[db.User.username == request.payload["to"]], fetch=1, columns=["id"])
+        if query:
+            id = query[0][0]
+            # reverse_request takes the userid of the requested user, the name of the function triggered, and the payload passed to that function.
+            # it returns a boolean of whether the server was able to send the request.
+            status = await request.server.reverse_request(id, "receive_message", {
+                "sender": sender,
+                "message": request.payload["message"]
+            })
+            if status: return "sent!"
+            else: # if the client is not online, do something else, maybe saving it in the database or something
+                return f"{request.payload['to']} is offline!"
+    else: return "login needed"
+```
+
+And here is the new client connection setup
+```python
+# this function will be called whenever a "receive_message" reverse request is called
+def receive_message(payload):
+    print(f"{payload['sender']}: {payload['message']}")
+
+conn = ConnectionHandler(host=gethostbyname(gethostname()), port=8080)
+conn.reverse_request_mapping({
+    "receive_message": receive_message
+})
+
+
+response = conn.send_request("send_message",{
+    "to": "John",
+    "message": "Hello, John!"
+})
+```
+
 ---
 
 ## Setting a Cloud Storage Server (optional; for complex server structures)
