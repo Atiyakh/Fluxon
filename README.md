@@ -227,7 +227,7 @@ And here is an asynchronous version of the same function (which is optimized for
 
 ```python
 async def signup(request):
-    """this view function introduces less blocking than the synchronous version"""
+    """asynchraonous view functions introduce way less blocking than the synchronous ones"""
     await User.Insert(request.pyload)
     return {"status": "200", "message": "Signed up successfully"}
 ```
