@@ -20,9 +20,9 @@ Fluxon combines the minimalist and flexible approach of Flask with Twisted's ext
 
 - **Just Clone the repository to your local machine and you should be good to go**
 
-    ```bash
-    git clone https://github.com/AtiyaKh/fluxon.git
-    ```
+```bash
+git clone https://github.com/AtiyaKh/fluxon.git
+```
 
 ---
 
