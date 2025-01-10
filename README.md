@@ -2,6 +2,8 @@
 
 Fluxon is a lightweight python-based general-purpose network engine. It offers secure communication, session handling, various server architectures and setups, and high-level database management making it an excellent choice for building server-side applications.
 
+Fluxon combines the minimalist and flexible approach of Flask with Twisted's extensibility and scalability. It introduces a modular, flow-based architecture for seamless client-server communication and innovative features like reverse requests and built-in cloud integration. 
+
 ---
 
 ## Table of Contents
