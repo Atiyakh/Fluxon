@@ -252,13 +252,16 @@ print(response)
 ```
 
 ### Running the Server
-Start the server by running your routing configuration:
+
+As we saw earlier, `run_server` from `Fluxon.Endpoint` is unironically responsible for running the server. Since we have already passed the server to `run_server` from the very beginning, you can literally run `server.py` to run the server—how easy!
 
 ```bash
 python server.py
 ```
 
-The server will automatically run an interactive console so you can interact directly with the server using the console, like updating the database schema, or terminating, debugging, etc....
+The server will automatically run an interactive console so you can reach to the server directly from the console, like updating the database schema, or terminating, debugging, other low-level session or connection lookup and inside-server implementations, etc...
+
+### Reverse Requests
 
 ## Setting a Cloud Storage Server (optional; for complex server structures)
 
