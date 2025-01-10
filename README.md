@@ -211,6 +211,8 @@ async_db = AsyncSqliteDatabase("path/to/database_file")
   ```python
   await db.User.Delete(where[db.User.id == 3])
   ```
+  Here is the thing tho, always add `await` before calling an asynchronous function, that way you're telling python to alternate between tasks and elemenate any I/O-related blocking 
+  (what am I sayin, you gon do it either way. the system crashes without awaiting coroutines)
 
 ---
 
