@@ -227,14 +227,14 @@ And here is an asynchronous version of the same function (which is optimized for
 
 ```python
 async def signup(request):
-    """asynchraonous view functions introduce way less blocking than the synchronous ones"""
+    """asynchraonous view functions introduce way less blocking than synchronous ones"""
     await User.Insert(request.pyload)
     return {"status": "200", "message": "Signed up successfully"}
 ```
 
 The request passed to the view is a ```Fluxon.Routing.Request``` object that contains the client's peername, session id, user id, the request payload, the connection object used by the server, and all the data you need. All requests passed are authenticated, you can authorize users (bind them to a user, which is supposed to be a Model.AuthorizedUser sub-class) using requests.login(user_id)
 
-###Client Interaction
+### Client Interaction
 Fluxon provides high-level class ```ConnectionHandler``` for managing client-side communication.
 
 #### Setting Up a Client
