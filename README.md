@@ -306,11 +306,12 @@ def receive_message(payload):
     print(f"{payload['sender']}: {payload['message']}")
 
 conn = ConnectionHandler(host=gethostbyname(gethostname()), port=8080)
+# map different reverse requests with functions here
 conn.reverse_request_mapping({
-    "receive_message": receive_message
+    "receive_message": receive_message,
 })
 
-
+# request for sending a message sending a message
 response = conn.send_request("send_message",{
     "to": "John",
     "message": "Hello, John!"
