@@ -280,7 +280,7 @@ Reverse requests in Fluxon eliminate the need for messy and unstructured two-way
 Below is an example of a real-time chat server utilizing reverse requests to send messages to clients:
 
 This is the view for sending a message and making a reverse request 
-```python
+```Server
 async def send_message(request):
     if request.userid:
         sender = await db.User.Check(db.where[db.User.id == request.userid], fetch=1, columns=['username'])[0][0]
@@ -300,7 +300,7 @@ async def send_message(request):
 ```
 
 And here is the new client connection setup
-```python
+```Client
 # this function will be called whenever a "receive_message" reverse request is called
 def receive_message(payload):
     print(f"{payload['sender']}: {payload['message']}")
