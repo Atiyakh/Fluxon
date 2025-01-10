@@ -234,6 +234,8 @@ async def signup(request):
 
 The request passed to the view is a ```Fluxon.Routing.Request``` object that contains the client's peername, session id, user id, the request payload, the connection object used by the server, and all the data you need. All requests passed are authenticated, you can authorize users (bind them to a user, which is supposed to be a Model.AuthorizedUser sub-class) using requests.login(user_id)
 
+---
+
 ### Client Interaction
 Fluxon provides high-level class ```ConnectionHandler``` for managing client-side communication.
 
@@ -251,6 +253,8 @@ response = conn.send_request("signup", {"username": "test", "password": "test123
 print(response)
 ```
 
+---
+
 ### Running the Server
 
 As we saw earlier, `run_server` from `Fluxon.Endpoint` is unironically responsible for running the server. Since we have already passed the server to `run_server` from the very beginning, you can literally run `server.py` to run the server—how easy!
@@ -261,7 +265,11 @@ python server.py
 
 The server will automatically run an interactive console so you can reach to the server directly from the console, like updating the database schema, or terminating, debugging, other low-level session or connection lookup and inside-server implementations, etc...
 
+---
+
 ### Reverse Requests
+
+---
 
 ## Setting a Cloud Storage Server (optional; for complex server structures)
 
