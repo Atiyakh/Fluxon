@@ -61,6 +61,8 @@ server = run_server(AsyncServer(
 ))
 ```
 
+---
+
 ### Router Setup
 The `Router` handles all incoming requests and maps them to appropriate views.
 
@@ -85,6 +87,8 @@ router = Router(
     models=models
 )
 ```
+
+---
 
 ### Database Management
 #### Database Integration in Fluxon
@@ -133,8 +137,8 @@ Once the models are defined, you can save the schema, which Fluxon will translat
 
 saving schema is straightforward, type ```saveschema``` in the interactive server console, and the modles you wrote will be automatically saved, loading that schema involved typeing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
 
-#### 3. **Data Manipulation**
-Once the schema is set, Fluxon allows you to easily manipulate your data using the ```Fluxon.Database.Manipulations.SqliteDatabase``` object, which is responsible for performing CRUD (Create, Read, Update, Delete) operations on your SQLite database.
+#### 3. **Data Manipulation and Database Interactions**
+Once the schema is set, Fluxon allows you to easily manipulate your data using ```Fluxon.Database.Manipulations.SqliteDatabase```, which is responsible for performing CRUD (Create, Read, Update, Delete) operations on your SQLite database.
 
 ```python
 from Fluxon.Database.Manipulation import SqliteDatabase
@@ -142,7 +146,7 @@ from Fluxon.Database.Manipulation import SqliteDatabase
 db = SqliteDatabase("path/to/database_file")
 ```
 
-Or you can use ```AsyncSqliteDatabase``` for full I/O support and non-blocking flow. Asynchronous database handling requires writing asynchronous views, which is not a bad idea by any means. This version uses connections pool to optimize database performace and avoid blocking. It also manages csoncurrent sql writings (setting ```check_same_thread``` to ```False```) without blocking the file.  
+Or you can use ```AsyncSqliteDatabase``` for full I/O support and non-blocking flow. Asynchronous database handling requires writing asynchronous views, which is not a bad idea at all. This version uses connection pooling to optimize database performace and avoid blocking. It also manages concurrent sql writing operations without locking the database file. (just use ```AsyncSqliteDatabase``` man)
 
 ```python
 from Fluxon.Database.Manipulation import AsyncSqliteDatabase
@@ -205,6 +209,8 @@ async_db = AsyncSqliteDatabase("path/to/database_file")
   ```python
   await db.User.Delete(where[db.User.id == 3])
   ```
+
+---
 
 ### Views
 Views are functions that handle specific requests. It can send any python object over the network, meaning that the client will receive the exact thing the view function returns, you can literally send an AI model with this if you want.
