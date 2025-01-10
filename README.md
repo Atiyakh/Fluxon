@@ -135,7 +135,7 @@ class Enrollment(Models.Model):
 #### 2. **Saving and Updating Database Schema**
 Once the models are defined, you can save the schema, which Fluxon will translate into SQL queries. These queries will be stored as ```.sql``` files in your defined schema directory. This translation ensures that your models are reflected as actual SQL tables in your database.
 
-saving schema is straightforward, type ```saveschema``` in the interactive server console, and the modles you wrote will be automatically saved, loading that schema involved typeing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
+saving schema is straightforward, type ```saveschema``` in the interactive server console, and the models you wrote will be automatically saved, loading that schema involved typeing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
 
 #### 3. **Data Manipulation and Database Interactions**
 Once the schema is set, Fluxon allows you to easily manipulate your data using ```Fluxon.Database.Manipulations.SqliteDatabase```, which is responsible for performing CRUD (Create, Read, Update, Delete) operations on your SQLite database.
@@ -441,7 +441,7 @@ async def create_owner(request):
         if rowid:
             username = (await async_db.User.Check(async_db.where[async_db.User.id == request.userid], fetch=1, columns=['username']))[0][0]
             request.grant_access(
-                granted_operation=request.cloud_operations.create_directory, # as you can see operation flags are all encapsulated in the request itself for simplicity along side the basic `grant_access` authorization method. (inhanced access control features on the way!!)
+                granted_operation=request.cloud_operations.create_directory, # as you can see operation flags are all encapsulated in the request itself for simplicity along side the basic `grant_access` authorization method. (enhanced access control features on the way!!)
                 cloud_relative_path=username
             )
             return {
@@ -493,7 +493,7 @@ async def create_folder(request): # create folder on cloud
     else: return "login required"
 
 async def write_file(request):
-    if request.userid: # singed in
+    if request.userid: # signed in
         access_granted = True
         file_path = pathlib.Path(request.payload['path'])
         query = (await async_db.Owner.Check(async_db.where[async_db.Owner.user == request.userid], fetch=1, columns=["id"]))
@@ -529,7 +529,7 @@ async def write_file(request):
     else: return "login required"
 
 async def delete_item(request):
-    if request.userid: # singed in
+    if request.userid: # signed in
         access_granted = True
         file_path = pathlib.Path(request.payload['path'])
         query = (await async_db.Owner.Check(async_db.where[async_db.Owner.user == request.userid], fetch=1, columns=["id"]))
@@ -565,7 +565,7 @@ async def delete_item(request):
     else: return "login required"
 
 async def read_file(request):
-    if request.userid: # singed in
+    if request.userid: # signed in
         access_granted = True
         file_path = pathlib.Path(request.payload['path'])
         query = (await async_db.Owner.Check(async_db.where[async_db.Owner.user == request.userid], fetch=1, columns=["id"]))
@@ -601,7 +601,7 @@ async def read_file(request):
     else: return "login required"
 
 async def read_tree(request):
-    if request.userid: # singed in
+    if request.userid: # signed in
         access_granted = True
         folder_path = pathlib.Path(request.payload['path'])
         query = (await async_db.Owner.Check(async_db.where[async_db.Owner.user == request.userid], fetch=1, columns=["id"]))
