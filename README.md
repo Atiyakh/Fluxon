@@ -146,7 +146,7 @@ from Fluxon.Database.Manipulation import SqliteDatabase
 db = SqliteDatabase("path/to/database_file")
 ```
 
-Or you can use ```AsyncSqliteDatabase``` for full I/O support and non-blocking flow. Asynchronous database handling requires writing asynchronous views, which is not a bad idea at all. This version uses connection pooling to optimize database performace and avoid blocking. It also manages concurrent sql writing operations without locking the database file. (just use ```AsyncSqliteDatabase``` man)
+Or you can use ```AsyncSqliteDatabase``` for full I/O support and non-blocking flow. Asynchronous database handling requires writing asynchronous views, which is not a bad idea at all. This version uses connection pooling to optimize database performance and avoid blocking. It also manages concurrent sql writing operations without locking the database file. (just use ```AsyncSqliteDatabase``` man)
 
 ```python
 from Fluxon.Database.Manipulation import AsyncSqliteDatabase
@@ -227,7 +227,7 @@ And here is an asynchronous version of the same function (which is optimized for
 
 ```python
 async def signup(request):
-    """asynchraonous view functions introduce way less blocking than synchronous ones"""
+    """asynchronous view functions introduce way less blocking than synchronous ones"""
     await User.Insert(request.pyload)
     return {"status": "200", "message": "Signed up successfully"}
 ```
@@ -270,6 +270,7 @@ The server will automatically run an interactive console so you can reach to the
 ### Reverse Requests
 
 A reverse request refers to a server-side request initiated by the server to trigger a function on the client side, mapped to a specific function name. You can use `request.server.reverse_request` to send a reverse request during runtime. This allows for dynamic client-server interactions, particularly useful for real-time applications.
+Reverse requests in Fluxon eliminate the need for messy and unstructured two-way communication implementations such as WebSockets. Mapping functions on the client side offers a high-level abstraction that simplifies bidirectional communication.
 
 Below is an example of a real-time chat server utilizing reverse requests to send messages to clients:
 
@@ -452,7 +453,7 @@ async def create_owner(request):
     else: return "login required"
 
 async def create_folder(request): # create folder on cloud
-    if request.userid: # singed in
+    if request.userid: # signed in
         access_granted = True
         folder_path = pathlib.Path(request.payload['path'])
         query = (await async_db.Owner.Check(async_db.where[async_db.Owner.user == request.userid], fetch=1, columns=["id"]))
