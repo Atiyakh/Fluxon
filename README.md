@@ -130,7 +130,7 @@ class Enrollment(Models.Model):
     date_enrolled = Models.DateField(auto_now_add=True)
 ```
 
-> You should use a ```Models.AuthorizedUser``` model only once!
++ **You should use a ```Models.AuthorizedUser``` model only once!**
 
 #### 2. **Saving and Updating Database Schema**
 Once the models are defined, you can save the schema, which Fluxon will translate into SQL queries. These queries will be stored as ```.sql``` files in your defined schema directory. This translation ensures that your models are reflected as actual SQL tables in your database.
