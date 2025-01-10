@@ -139,11 +139,11 @@ Once the models are defined, you can save the schema, which Fluxon will translat
 
 saving schema is straightforward, type ```saveschema``` in the interactive server console, and the models you wrote will be automatically saved, loading that schema involved typeing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
 
-#### 3. **Data Manipulation and Database Interactions**
+#### 3. **Data Manipulations and Database Interactions**
 Once the schema is set, Fluxon allows you to easily manipulate your data using ```Fluxon.Database.Manipulations.SqliteDatabase```, which is responsible for performing CRUD (Create, Read, Update, Delete) operations on your SQLite database.
 
 ```python
-from Fluxon.Database.Manipulation import SqliteDatabase
+from Fluxon.Database.Manipulations import SqliteDatabase
 
 db = SqliteDatabase("path/to/database_file")
 ```
@@ -151,7 +151,7 @@ db = SqliteDatabase("path/to/database_file")
 Or you can use ```AsyncSqliteDatabase``` for full I/O support and non-blocking flow. Asynchronous database handling requires writing asynchronous views, which is not a bad idea at all. This version uses connection pooling to optimize database performance and avoid blocking. It also manages concurrent sql writing operations without locking the database file. (just use ```AsyncSqliteDatabase``` man)
 
 ```python
-from Fluxon.Database.Manipulation import AsyncSqliteDatabase
+from Fluxon.Database.Manipulations import AsyncSqliteDatabase
 
 async_db = AsyncSqliteDatabase("path/to/database_file")
 ```
