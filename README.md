@@ -274,7 +274,7 @@ The server will automatically run an interactive console so you can reach to the
 
 ### Reverse Requests
 
-A reverse request refers to a server-side request initiated by the server to trigger a function on the client side, mapped to a specific function name. You can use `request.server.reverse_request` to send a reverse request during runtime. This allows for dynamic client-server interactions, particularly useful for real-time applications.
+A reverse request refers to a server-side request initiated by the server to trigger a **thread-safe** function on the client side, mapped to a specific function name. You can use `request.server.reverse_request` to send a reverse request during runtime. This allows for dynamic client-server interactions, particularly useful for real-time applications.
 Reverse requests in Fluxon eliminate the need for messy and unstructured two-way communication implementations such as WebSockets. Mapping functions on the client side offers a high-level abstraction that simplifies bidirectional communication.
 
 Below is an example of a real-time chat server utilizing reverse requests to send messages to clients:
@@ -317,6 +317,35 @@ response = conn.send_request("send_message",{
     "message": "Hello, John!"
 })
 ```
+
++ Just remember that reverse request functions are always thread-safe! (I will make some quick cross-thread communication solutions for common non-thread-safe function cases soon)
++ In multi-threaded applications, when a background worker thread needs to call non-thread-safe functions in the main thread (such as updating a GUI), directly invoking them can cause issues. To handle this, 
+  use a worker thread that places function calls into a thread-safe queue, which the main thread periodically checks and processes. This ensures that non-thread-safe operations are executed in the main thread 
+  without causing threading conflicts. Here’s an example of how this can be implemented:
+
+  ```python
+  Copy code
+  import threading
+  import queue
+  
+  def update_ui(value):
+    print(f"UI updated with {value}")
+
+  def background_worker(task_queue):
+      for i in range(5):
+          task_queue.put((update_ui, i))
+
+  task_queue = queue.Queue()
+  worker_thread = threading.Thread(target=background_worker, args=(task_queue,))
+  worker_thread.start()
+
+  while not task_queue.empty():
+      func, args = task_queue.get()
+      func(*args)
+
+  worker_thread.join()
+  This approach ensures safe function calls from the background thread by letting the main thread process them sequentially.
+  ```
 
 ---
 
