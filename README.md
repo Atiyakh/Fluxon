@@ -137,7 +137,7 @@ class Enrollment(Models.Model):
 #### 2. **Saving and Updating Database Schema**
 Once the models are defined, you can save the schema, which Fluxon will translate into SQL queries. These queries will be stored as ```.sql``` files in your defined schema directory. This translation ensures that your models are reflected as actual SQL tables in your database.
 
-saving schema is straightforward, type ```saveschema``` in the interactive server console, and the models you wrote will be automatically saved, loading that schema involved typeing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
+saving schema is straightforward, type ```saveschema``` in the interactive server console, and the models you wrote will be automatically saved, loading that schema involved typing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
 
 #### 3. **Data Manipulations and Database Interactions**
 Once the schema is set, Fluxon allows you to easily manipulate your data using ```Fluxon.Database.Manipulations.SqliteDatabase```, which is responsible for performing CRUD (Create, Read, Update, Delete) operations on your SQLite database.
@@ -212,7 +212,7 @@ db.User.Delete(where[db.User.id == 3])
 await db.User.Delete(where[db.User.id == 3])
 ```
 
-Here is the thing tho, always add `await` before calling an asynchronous function, that way you're telling python to alternate between tasks and elemenate any I/O-related blocking 
+Here is the thing tho, always add `await` before calling an asynchronous function, that way you're telling python to alternate between tasks and eliminate any I/O-related blocking 
 (what am I sayin, you gon do it either way. the system crashes without awaiting coroutines bro)
 
 ---
