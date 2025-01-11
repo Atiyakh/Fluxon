@@ -318,7 +318,7 @@ response = conn.send_request("send_message",{
 })
 ```
 
-+ Just remember that reverse request functions are always thread-safe! (I will make some quick cross-thread communication solutions for common non-thread-safe function cases soon)
++ Just remember that reverse request functions should be always thread-safe! (I will make some quick cross-thread communication solutions for common non-thread-safe function cases soon)
 + In multi-threaded applications, when the `ConnectionHandler` needs to call non-thread-safe reverse view functions in the main thread (such as updating a GUI), directly invoking them can cause issues. To handle this, use a worker thread that places function calls into a thread-safe queue, which the main thread periodically checks and processes. This ensures that non-thread-safe operations are executed in the main thread without causing threading conflicts.
 
 ---
