@@ -285,6 +285,7 @@ class AsyncServer(Server):
                     message = f"{view}|".encode()+serialized_data
                     reverse_connection.writer.write(content_length(len(message))+message)
                     await reverse_connection.writer.drain()
+                    return True
                 else:
                     return False
             else:
@@ -653,6 +654,7 @@ def active_console_async(server:AsyncServer, shared_data:dict, logger:logging.Lo
             if 'event_loop' in shared_data:
                 if isinstance(shared_data['event_loop'], asyncio.BaseEventLoop):
                     asyncio.run_coroutine_threadsafe(server.stop_server() , shared_data['event_loop'])
+                    break
                 else:
                     logger.error("Invalid event loop | asyncio.BaseEventLoop instance should be provided")
             else:
@@ -684,6 +686,7 @@ def active_console_async(server:AsyncServer, shared_data:dict, logger:logging.Lo
         else:
             try: exec(command, locals())
             except: traceback.print_exc()
+    exit()
 
 def run_server(server:Server):
     caller_path = pathlib.Path(inspect.currentframe().f_back.f_code.co_filename)

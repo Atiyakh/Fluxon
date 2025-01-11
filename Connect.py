@@ -42,7 +42,10 @@ class ConnectionHandler:
             view = view.decode()
             data = pickle.loads(serialized_data)
             if view in self.mapping:
-                self.mapping[view](data)
+                self.main_thread.queue.put((
+                    self.mapping[view],
+                    (data,)
+                ))
             else:
                 print(f'ReverseRequestError: function "{view}" not mapped')
         except Exception as e:
@@ -121,6 +124,8 @@ class ConnectionHandler:
         self.host = host
         self.port = port
         self.response_ = None
+        # thread-safe calls for foreign functions
+        self.main_thread = threading.current_thread()
         # establish connection
         self.establish_connection()
         # keep connection alive
