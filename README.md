@@ -283,7 +283,7 @@ This is the view for sending a message and making a reverse request. Write this 
 ```python
 async def send_message(request):
     if request.userid:
-        sender = await db.User.Check(db.where[db.User.id == request.userid], fetch=1, columns=['username'])[0][0]
+        sender = (await db.User.Check(db.where[db.User.id == request.userid], fetch=1, columns=['username']))[0][0]
         query = await db.User.Check(db.where[db.User.username == request.payload["to"]], fetch=1, columns=["id"])
         if query:
             id = query[0][0]
