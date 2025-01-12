@@ -311,11 +311,20 @@ conn.reverse_request_mapping({
     "receive_message": receive_message,
 })
 
-# request for sending a message sending a message
+# logging in
+conn.send_request("login",{
+    "username": "Mike",
+    "password": "M@123abc"
+})
+
+# request for sending a message
 response = conn.send_request("send_message",{
     "to": "John",
     "message": "Hello, John!"
 })
+
+print(response)
+# prints either "sent!" or "John is offline!"
 ```
 
 + Just remember that reverse request functions should be always thread-safe! (I will make some quick cross-thread communication solutions for common non-thread-safe function cases soon)
