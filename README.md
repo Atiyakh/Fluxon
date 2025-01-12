@@ -290,7 +290,7 @@ async def send_message(request):
             # reverse_request takes the userid of the requested user, the name of the function triggered, and the payload passed to that function.
             # it returns a boolean of whether the server was able to send the request.
             status = await request.server.reverse_request(id, "receive_message", {
-                "sender": sender,
+                "from": sender,
                 "message": request.payload["message"]
             })
             if status: return "sent!"
@@ -303,7 +303,7 @@ And here is the new client connection setup
 ```python
 # this function will be called whenever a "receive_message" reverse request is called
 def receive_message(payload):
-    print(f"{payload['sender']}: {payload['message']}")
+    print(f"{payload['from']}: {payload['message']}")
 
 conn = ConnectionHandler(host=gethostbyname(gethostname()), port=8080)
 # map different reverse requests with functions here
