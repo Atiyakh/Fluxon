@@ -671,9 +671,9 @@ cloud = CloudStorageConnector('192.168.1.6', 8888)
 
 # login request
 response = conn.send_request("login", {
-    "username": "AtiyaKh",
-    "password": "Atty@kh123",
-    "email": "atiyaalkhodari1@gmail.com"
+    "username": "Jack",
+    "password": "Jack@123",
+    "email": "Jack@gmail.com"
 })
 
 file_to_upload = "path/to/file"
