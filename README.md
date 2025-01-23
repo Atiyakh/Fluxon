@@ -701,12 +701,12 @@ cloud_response = cloud.send_request(cloud_request, conn.sessionid)
 - **Independent Server Architecture:** Fluxon is not tied to browser-based interaction, making it ideal for real-time and unconventional server setups.
 - **Simplified Reverse Requests:** Easily implement bidirectional communication without the complexity of WebSockets or low-level networking protocols.
 - **Flexible Routing:** Intuitive mapping of request paths to view functions with support for asynchronous workflows, enabling seamless request handling.
-- **Integrated Cloud Storage System:** Built-in cloud storage support acts like a media system (e.g., Django) but with unparalleled flexibility and server-side authorization.
+- **Integrated Cloud Storage System:** Built-in cloud storage support acts like a media system with unparalleled flexibility and server-side authorization.
 - **Database Integration:** Use a Django-inspired ORM to define models and manage schemas with SQLite for streamlined database operations.
 - **Secure Sessions:** Session-based authentication secured with private keys for robust communication.
 - **Python Object Serialization:** Effortlessly send and receive complex Python objects using `pickle`.
 - **Session Management:** Manage persistent client-server connections with advanced session handling.
-- **Asynchronous Support:** Optimize performance with async-ready components for servers, databases, and views.
+- **Asynchronous Support:** Optimize performance with async-ready components for servers, databases, and views. Fluxon.AsyncServer is 21% faster than Django (see [benchmark test cases](https://github.com/Atiyakh/Fluxon/tree/main/benchmarks))
 
 ---
 
@@ -724,7 +724,7 @@ Fluxon stands out from traditional frameworks like Django, Flask, or Twisted by 
 
 ### 3. Flexible Request Handling
 - Fluxon allows highly customizable request handling with minimal effort.
-- Define routes, map them to views, and integrate with asynchronous workflows to fit any server structure.
+- Define routes, map them to views, and integrate them with asynchronous workflows to fit any server structure.
 
 ### 4. Integrated Cloud Storage System
 - Fluxon features a built-in cloud storage system, offering:
