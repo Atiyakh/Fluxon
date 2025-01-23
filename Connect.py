@@ -60,7 +60,6 @@ class ConnectionHandler:
             try:
                 sock = socket(AF_INET, SOCK_STREAM)
                 sock.connect((self.host, self.port))
-                print("[Establish_Connection] Connection Stable (DUMP)")
                 return sock
             except (ConnectionAbortedError, ConnectionError, ConnectionRefusedError, ConnectionResetError):
                 print("[Establish_Connection] Failed to connect with the server; re-establish connection in one second")
@@ -121,7 +120,10 @@ class ConnectionHandler:
         self.sessionid = ''
         self.mapping = dict()
         self.main_sock = None
-        self.host = host
+        if host == 'localhost':
+            self.host = gethostbyname(gethostname())
+        else:
+            self.host = host
         self.port = port
         self.response_ = None
         # thread-safe calls for foreign functions
@@ -137,7 +139,6 @@ class CloudStorageConnector:
         try:
             sock = socket(AF_INET, SOCK_STREAM)
             sock.connect((self.host, self.port))
-            print("[Establish_Connection] Connection Stable (DUMP)")
             return sock
         except (ConnectionAbortedError, ConnectionError, ConnectionRefusedError, ConnectionResetError):
             print("[Establish_Connection] Failed to connect with the server; re-establish connection in one second")

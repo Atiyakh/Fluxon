@@ -1,6 +1,6 @@
-![](https://github.com/Atiyakh/Fluxon/blob/main/benchmarks/fluxon_logo.png)
-# What is Fluxon?
-Fluxon is a lightweight general-purpose network engine written from scratch in Python. It offers secure communication, session handling, various server architectures and setups, and high-level database management making it an excellent choice for building server-side applications.
+# Fluxon
+
+Fluxon is a lightweight python-based general-purpose network engine. It offers secure communication, session handling, various server architectures and setups, and high-level database management making it an excellent choice for building server-side applications.
 
 Fluxon combines the minimalist and flexible approach of Flask with Twisted's extensibility and scalability. It introduces a modular, flow-based architecture for seamless client-server communication and innovative features like reverse requests and built-in cloud integration. 
 
@@ -23,7 +23,6 @@ Fluxon combines the minimalist and flexible approach of Flask with Twisted's ext
 ```bash
 git clone https://github.com/AtiyaKh/fluxon.git
 ```
-Make sure to add the folder `Fluxon` to your `Python\Lib` directory alongside the other amazing libraries you use. This should enable you to use Fluxon everywhere, since it will to be considered as a legit python library.
 
 ---
 
@@ -42,9 +41,6 @@ server = run_server(AsyncServer(
     router=router.router
 ))
 ```
-
-**You can run this command `python Fluxon.StartProject AsyncServer path/to/project` and your project including `server.py` and `router.py` setup, models and views files, a logging directory for your server, database schema directory and an automatically generated security key will all be automatically be created for you :)
-These server templates will be expanded in the near futures to include all the needed setups including a highly optimized HTTP server, FTP server, cloud storage integration, and different database system integrations other than SQLite.**
 
 ```Fluxon.Endpoint.AsyncServer``` is a robust, flexible server infrastructure supporting asynchronous connections and reverse requests, making it ideal for most server setups.
 
@@ -141,7 +137,7 @@ class Enrollment(Models.Model):
 #### 2. **Saving and Updating Database Schema**
 Once the models are defined, you can save the schema, which Fluxon will translate into SQL queries. These queries will be stored as ```.sql``` files in your defined schema directory. This translation ensures that your models are reflected as actual SQL tables in your database.
 
-saving schema is straightforward, type ```saveschema``` in the interactive server console, and the models you wrote will be automatically saved, loading that schema involved typing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
+saving schema is straightforward, type ```saveschema``` in the interactive server console, and the models you wrote will be automatically saved, loading that schema involved typeing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
 
 #### 3. **Data Manipulations and Database Interactions**
 Once the schema is set, Fluxon allows you to easily manipulate your data using ```Fluxon.Database.Manipulations.SqliteDatabase```, which is responsible for performing CRUD (Create, Read, Update, Delete) operations on your SQLite database.
@@ -216,7 +212,7 @@ db.User.Delete(where[db.User.id == 3])
 await db.User.Delete(where[db.User.id == 3])
 ```
 
-Here is the thing tho, always add `await` before calling an asynchronous function, that way you're telling python to alternate between tasks and eliminate any I/O-related blocking 
+Here is the thing tho, always add `await` before calling an asynchronous function, that way you're telling python to alternate between tasks and elemenate any I/O-related blocking 
 (what am I sayin, you gon do it either way. the system crashes without awaiting coroutines bro)
 
 ---
@@ -278,7 +274,7 @@ The server will automatically run an interactive console so you can reach to the
 
 ### Reverse Requests
 
-A reverse request refers to a server-side request initiated by the server to trigger a **thread-safe** function on the client side, mapped to a specific function name. You can use `request.server.reverse_request` to send a reverse request during runtime. This allows for dynamic client-server interactions, particularly useful for real-time applications.
+A reverse request refers to a server-side request initiated by the server to trigger a function on the client side, mapped to a specific function name. You can use `request.server.reverse_request` to send a reverse request during runtime. This allows for dynamic client-server interactions, particularly useful for real-time applications.
 Reverse requests in Fluxon eliminate the need for messy and unstructured two-way communication implementations such as WebSockets. Mapping functions on the client side offers a high-level abstraction that simplifies bidirectional communication.
 
 Below is an example of a real-time chat server utilizing reverse requests to send messages to clients:
@@ -287,14 +283,14 @@ This is the view for sending a message and making a reverse request. Write this 
 ```python
 async def send_message(request):
     if request.userid:
-        sender = (await db.User.Check(db.where[db.User.id == request.userid], fetch=1, columns=['username']))[0][0]
+        sender = await db.User.Check(db.where[db.User.id == request.userid], fetch=1, columns=['username'])[0][0]
         query = await db.User.Check(db.where[db.User.username == request.payload["to"]], fetch=1, columns=["id"])
         if query:
             id = query[0][0]
             # reverse_request takes the userid of the requested user, the name of the function triggered, and the payload passed to that function.
             # it returns a boolean of whether the server was able to send the request.
             status = await request.server.reverse_request(id, "receive_message", {
-                "from": sender,
+                "sender": sender,
                 "message": request.payload["message"]
             })
             if status: return "sent!"
@@ -307,7 +303,7 @@ And here is the new client connection setup
 ```python
 # this function will be called whenever a "receive_message" reverse request is called
 def receive_message(payload):
-    print(f"{payload['from']}: {payload['message']}")
+    print(f"{payload['sender']}: {payload['message']}")
 
 conn = ConnectionHandler(host=gethostbyname(gethostname()), port=8080)
 # map different reverse requests with functions here
@@ -315,24 +311,12 @@ conn.reverse_request_mapping({
     "receive_message": receive_message,
 })
 
-# logging in
-conn.send_request("login",{
-    "username": "Mike",
-    "password": "M@123abc"
-})
-
-# request for sending a message
+# request for sending a message sending a message
 response = conn.send_request("send_message",{
     "to": "John",
     "message": "Hello, John!"
 })
-
-print(response)
-# prints either "sent!" or "John is offline!"
 ```
-
-+ Just remember that reverse request functions should be always thread-safe! (I will make some quick cross-thread communication solutions for common non-thread-safe function cases soon)
-+ In multi-threaded applications, when the `ConnectionHandler` needs to call non-thread-safe reverse view functions in the main thread (such as a function that updates GUI elements based on server inputs from the reverse request, like getting a notification or receiving a message or whatever), directly invoking them can cause issues. To handle this, use a worker thread that places function calls into a thread-safe queue, which the main thread periodically checks and processes. This ensures that non-thread-safe operations are executed in the main thread without causing threading conflicts.
 
 ---
 
@@ -675,9 +659,9 @@ cloud = CloudStorageConnector('192.168.1.6', 8888)
 
 # login request
 response = conn.send_request("login", {
-    "username": "Jack",
-    "password": "Jack@123",
-    "email": "Jack@gmail.com"
+    "username": "AtiyaKh",
+    "password": "Atty@kh123",
+    "email": "atiyaalkhodari1@gmail.com"
 })
 
 file_to_upload = "path/to/file"
@@ -705,12 +689,12 @@ cloud_response = cloud.send_request(cloud_request, conn.sessionid)
 - **Independent Server Architecture:** Fluxon is not tied to browser-based interaction, making it ideal for real-time and unconventional server setups.
 - **Simplified Reverse Requests:** Easily implement bidirectional communication without the complexity of WebSockets or low-level networking protocols.
 - **Flexible Routing:** Intuitive mapping of request paths to view functions with support for asynchronous workflows, enabling seamless request handling.
-- **Integrated Cloud Storage System:** Built-in cloud storage support acts like a media system with unparalleled flexibility and server-side authorization.
+- **Integrated Cloud Storage System:** Built-in cloud storage support acts like a media system (e.g., Django) but with unparalleled flexibility and server-side authorization.
 - **Database Integration:** Use a Django-inspired ORM to define models and manage schemas with SQLite for streamlined database operations.
 - **Secure Sessions:** Session-based authentication secured with private keys for robust communication.
 - **Python Object Serialization:** Effortlessly send and receive complex Python objects using `pickle`.
 - **Session Management:** Manage persistent client-server connections with advanced session handling.
-- **Asynchronous Support:** Optimize performance with async-ready components for servers, databases, and views. Fluxon.AsyncServer is 21% faster than Django (see [benchmark testcases](https://github.com/Atiyakh/Fluxon/tree/main/benchmarks))
+- **Asynchronous Support:** Optimize performance with async-ready components for servers, databases, and views.
 
 ---
 
@@ -728,7 +712,7 @@ Fluxon stands out from traditional frameworks like Django, Flask, or Twisted by 
 
 ### 3. Flexible Request Handling
 - Fluxon allows highly customizable request handling with minimal effort.
-- Define routes, map them to views, and integrate them with asynchronous workflows to fit any server structure.
+- Define routes, map them to views, and integrate with asynchronous workflows to fit any server structure.
 
 ### 4. Integrated Cloud Storage System
 - Fluxon features a built-in cloud storage system, offering:
