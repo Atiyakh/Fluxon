@@ -1,4 +1,4 @@
-| ![](https://via.placeholder.com/150) |
+| ![](https://github.com/Atiyakh/Fluxon/blob/main/benchmarks/logo.png) |
 |:-------------------------------------------:|
 # Fluxon
 
