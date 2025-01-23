@@ -706,7 +706,7 @@ cloud_response = cloud.send_request(cloud_request, conn.sessionid)
 - **Secure Sessions:** Session-based authentication secured with private keys for robust communication.
 - **Python Object Serialization:** Effortlessly send and receive complex Python objects using `pickle`.
 - **Session Management:** Manage persistent client-server connections with advanced session handling.
-- **Asynchronous Support:** Optimize performance with async-ready components for servers, databases, and views. Fluxon.AsyncServer is 21% faster than Django (see [benchmark test cases](https://github.com/Atiyakh/Fluxon/tree/main/benchmarks))
+- **Asynchronous Support:** Optimize performance with async-ready components for servers, databases, and views. Fluxon.AsyncServer is 21% faster than Django (see [benchmark testcases](https://github.com/Atiyakh/Fluxon/tree/main/benchmarks))
 
 ---
 
