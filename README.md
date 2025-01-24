@@ -42,8 +42,8 @@ server = run_server(AsyncServer(
 ))
 ```
 
-**You can run this command `python -m Fluxon.StartProject AsyncServer path/to/project` and your project including `server.py` and `router.py` setup, models and views files, a logging directory for your server, database schema directory and an automatically generated security key will all be automatically be created for you :)
-These server templates will be expanded in the near futures to include all the needed setups including a highly optimized HTTP server, FTP server, cloud storage integration, and different database system integrations other than SQLite.**
+**You can run this command `python -m Fluxon.StartProject AsyncServer path/to/project` and your project including `server.py` and `router.py` setup, models and views files, a logging directory for your server, database schema directory and a security key will all be automatically generated for you :)
+These server templates will be expanded in the near future to include all the needed setups including a highly optimized HTTP server, FTP server, cloud storage integration, and different database system integrations other than SQLite.**
 
 ```Fluxon.Endpoint.AsyncServer``` is a robust, flexible server infrastructure supporting asynchronous connections and reverse requests, making it ideal for most server setups.
 
