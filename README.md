@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/Atiyakh/Fluxon/refs/heads/main/benchmarks/fluxon_logo.png)
+![](http://localhost:8000/image.png)
 # What is Fluxon?
 Fluxon is a lightweight general-purpose network engine written from scratch in Python. It offers secure communication, session handling, various server architectures and setups, and high-level database management making it an excellent choice for building server-side applications.
 
