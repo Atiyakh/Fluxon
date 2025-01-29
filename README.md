@@ -714,12 +714,11 @@ cloud_response = cloud.send_request(cloud_request, conn.sessionid)
 #### **Here are some benchmark results for managing 400 concurrent connections of 50 KB each:**
 | Framework  | Total Time (400 requests) | Average Response Time |
 |------------|---------------------------|-----------------------|
+| Fluxon     | 0.35s                     | 0.0009s               |
 | Django     | 0.53s                     | 0.0013s               |
 | FastAPI    | 0.19s                     | 0.0005s               |
 | Flask      | 0.45s                     | 0.0011s               |
-| Fluxon     | 0.35s                     | 0.0009s               |
-
-
+Fluxon comes second as the fastest server endpoint after FastAPI (:
 ---
 
 ## Why Choose Fluxon?
