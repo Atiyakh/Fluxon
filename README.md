@@ -712,14 +712,15 @@ cloud_response = cloud.send_request(cloud_request, conn.sessionid)
 - **Asynchronous Support:** Optimize performance with async-ready components for servers, databases, and views. Fluxon.AsyncServer is 21% faster than Django (see [benchmark testcases](https://github.com/Atiyakh/Fluxon/tree/main/benchmarks))
 
 #### **Here are some benchmark results for managing 400 concurrent connections of 50 KB each:**
-| Framework  | Total Time (400 requests) | Average Response Time |
-|------------|---------------------------|-----------------------|
-| Fluxon     | 0.35s                     | 0.0009s               |
-| Django     | 0.53s                     | 0.0013s               |
-| FastAPI    | 0.19s                     | 0.0005s               |
-| Flask      | 0.45s                     | 0.0011s               |
+| Framework    | Total Time (400 requests) | Average Response Time |
+|--------------|---------------------------|-----------------------|
+| **Fluxon**   | 0.83s                     | 0.0021s               |
+| **Django**   | 1.56s                     | 0.0039s               |
+| **FastAPI**  | 0.70s                     | 0.0018s               |
+| **Flask**    | 1.42s                     | 0.0035s               |
 
-##### *Fluxon comes second as the fastest server endpoint after FastAPI (:
+
+##### Fluxon ranks second in speed for server endpoints, following FastAPI.
 ---
 
 ## Why Choose Fluxon?
