@@ -718,6 +718,7 @@ cloud_response = cloud.send_request(cloud_request, conn.sessionid)
 | Django     | 0.53s                     | 0.0013s               |
 | FastAPI    | 0.19s                     | 0.0005s               |
 | Flask      | 0.45s                     | 0.0011s               |
+
 Fluxon comes second as the fastest server endpoint after FastAPI (:
 ---
 
