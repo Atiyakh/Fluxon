@@ -22,13 +22,16 @@ Fluxon combines the minimalist and flexible approach of Flask with Twisted's ext
 ```bash
 git clone https://github.com/AtiyaKh/fluxon.git
 ```
-Make sure to add the folder `Fluxon` to your `Python\Lib` directory alongside the other amazing libraries you use. This should enable you to use Fluxon everywhere, since it will to be considered as a legit python library.
+Make sure to add the folder `Fluxon` to your `Python\Lib` directory alongside the other amazing libraries you use. This should enable you to use Fluxon everywhere, since it will to be recognized as a legit python library on your local machine. (I will add a pip installation when the library is ready for production)
 
 ---
 
 ## Getting Started
 
 ### Setting up The Server
+**You can run this command `python -m Fluxon.StartProject AsyncServer path/to/project` and your project including `server.py` and `router.py` setup, models and views files, a logging directory for your server, database schema directory and a security key will all be automatically generated for you :)
+These server templates will be expanded in the near future to include all the needed setups including a highly optimized HTTP server, FTP server, cloud storage integration, and different database system integrations other than SQLite.** You can also set the server manually as follows, Fluxon is highly flexible with server setups.
+
 Setting up the server is pretty simple. First you pick your favorite server from ```Fluxon.Endpoint```, let's say you happened to choose ```AsyncServer``` as your main Endpoint for your application (which is the only one available right now, more on the way tho)
 
 write this in your ```server.py```
@@ -41,9 +44,6 @@ server = run_server(AsyncServer(
     router=router.router
 ))
 ```
-
-**You can run this command `python -m Fluxon.StartProject AsyncServer path/to/project` and your project including `server.py` and `router.py` setup, models and views files, a logging directory for your server, database schema directory and a security key will all be automatically generated for you :)
-These server templates will be expanded in the near future to include all the needed setups including a highly optimized HTTP server, FTP server, cloud storage integration, and different database system integrations other than SQLite.**
 
 ```Fluxon.Endpoint.AsyncServer``` is a robust, flexible server infrastructure supporting asynchronous connections and reverse requests, making it ideal for most server setups.
 
