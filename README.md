@@ -709,15 +709,15 @@ cloud_response = cloud.send_request(cloud_request, conn.sessionid)
 - **Secure Sessions:** Session-based authentication secured with private keys for robust communication.
 - **Python Object Serialization:** Effortlessly send and receive complex Python objects using `pickle`.
 - **Session Management:** Manage persistent client-server connections with advanced session handling.
-- **Asynchronous Support:** Optimize performance with async-ready components for servers, databases, and views. Fluxon.AsyncServer is much faster than frameworks Flask and Django, thanks to its end-to-end highly asynchronous workflow (see [benchmark test results](https://github.com/Atiyakh/Fluxon/tree/main/benchmarks))
+- **Asynchronous Support:** Optimized performance with async-ready components for servers, databases, and views. Fluxon.AsyncServer is much faster than frameworks Flask and Django, thanks to its end-to-end asynchronous workflow (see [benchmark test results](https://github.com/Atiyakh/Fluxon/tree/main/benchmarks))
 
 #### **Here are some benchmark results for managing 400 concurrent requests of 50 KB each:**
 | Framework    | Total Time (400 requests) | Average Response Time |
 |--------------|---------------------------|-----------------------|
-| **Fluxon**   | 0.83s                     | 0.0021s               |
-| **Django**   | 1.56s                     | 0.0039s               |
-| **FastAPI**  | 0.70s                     | 0.0018s               |
-| **Flask**    | 1.42s                     | 0.0035s               |
+| **Fluxon**   | 0.83s                     | 2.1ms                 |
+| **Django**   | 1.56s                     | 3.9ms                 |
+| **FastAPI**  | 0.70s                     | 1.8ms                 |
+| **Flask**    | 1.42s                     | 3.5ms                 |
 
 ##### Fluxon ranks second in speed for server endpoints, following FastAPI.
 ---
