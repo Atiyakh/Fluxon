@@ -214,9 +214,48 @@ Views are functions that handle specific requests. It can send any python object
 Example signup view from ```views.py```:
 
 ```python
-def signup(request):
-    User.Insert(request.pyload)  # using `SqliteDatabase` here
-    return {"status": "200", "message": "Signed up successfully"}
+from Fluxon.Database.Manipulations import where
+from Fluxon.Database.Validators import validate_email, validate_password, validate_username
+from Fluxon.Security import Hash
+from models import User
+
+async def signup(request):
+    # extract payload
+    username = request.payload['username']
+    email = request.payload['email']
+    password = request.payload['password']
+    # validation
+    if not validate_username():
+        return {'response': 'invalid username'}
+    if not validate_email(email):
+        return {'response': 'invalid email'}
+    if not validate_password(password):
+        return {'response': 'invalid password'}
+    # insert user
+    hashed_password = Hash.hash(password, algorithm=Hash.SHA512)
+    user_id = await User.Insert(   # "Insert" returns the rowid of the inserted row
+        username=username,
+        email=email,
+        password=hashed_password
+    )
+    # login user [binds the user id with the session/connetion/cloud server (if there was one ofc)]
+    request.login(user_id)
+    return {"response": "signed up successfully"}
+
+async def login(request):
+    # extract payload
+    username = request.payload['username']
+    password = request.payload['password']
+    # check credentials
+    hashed_password = Hash.hash(password, algorithm=Hash.SHA512)
+    query = await User.Check(where[
+        (User.username == username) & (User.password == hashed_password)
+    ], fetch=1, columns=[User.id])
+    if query:
+        request.login(query[0][0])  # [0][0] -> [first result][fist column (the "id" column)]
+        return {"response": "logged in successfully"}
+    else:
+        return {"response": "wrong username or password"}
 ```
 
 The request passed to the view is a ```Fluxon.Routing.Request``` object that contains the client's peername, session id, user, the request payload, the connection object used by the server, and all the data you need. All requests passed are authenticated, you can authorize users (bind them to a user, which is supposed to be a Model.AuthorizedUser sub-class) using requests.login(user_id)
