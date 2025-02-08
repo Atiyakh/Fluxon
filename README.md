@@ -17,12 +17,18 @@ Fluxon combines the minimalist and flexible approach of Flask with Twisted's ext
 
 ## Installation
 
-- **Just Clone the repository to your local machine and you should be good to go**
+- **Just clone the repository to your local machine and you should be good to go**
 
 ```bash
 git clone https://github.com/AtiyaKh/fluxon.git
 ```
-Make sure to add the folder `Fluxon` to your `Python\Lib` directory alongside the other amazing libraries you use. This should enable you to use Fluxon everywhere, since it will to be recognized as a legit python library on your local machine. (I will add a pip installation when the library is ready for production)
+*Watch out for dependencies at `requirements.txt`! Make sure they all installed as well.*
+
+- **You can also use pip installation**
+
+```bash
+pip install Fluxon
+```
 
 ---
 
@@ -337,364 +343,166 @@ print(response)
 
 ## Setting a Cloud Storage Server (optional; for complex server structures)
 
-Now this might sound a little complicated, just follow along to get yourself a cloud server
+**Run this command `python -m Fluxon.StartProject AsyncServer --cloud path/to/project` for a fully-integrated RBAC cloud server.**
 
-This is your new ```server.py```
+That's your new ```server.py``` with a `CloudStorageServer` integration (I will elaborate more on different server setups and integrations when I make other custom endpoints):
 
 ```python
 from Fluxon.Endpoint import AsyncServer, CloudStorageServer, run_server
 import router
 
-# this is the base directory for your cloud server
-cloud_folder = "/path/to/cloud_folder"
+# Welcome to Fluxon!
 
-server = run_server(AsyncServer(
+run_server(AsyncServer(
     port=8080, secure=False,
-    router=router.router,
+    setup=router.setup,
+
     # cloud storage setup
     cloud_storage=CloudStorageServer(
         port=8888, secure=False,
-        cloud_folder=cloud_folder
     )
 ))
 ```
 
-This server setup integrates your ```CloudStorageServer``` in your main server ```AsyncServer```. (I will elaborate more on different server setups when I make other custom endpoints)
-
 And here's the code for ```router.py```
 
 ```python
-from Fluxon.Routing import Router
-import cloud_models
-import views
+import pathlib
+from Fluxon.Routing import Setup
+from Fluxon.Database.Manipulations import AsyncSQLiteDatabase
+from Fluxon.Security import Secrets
+from authentication_model import CloudAuthenticationModel
+import views, models
 
-SERVER_SECURITY_KEY = "RsxZd5wVVml7C0H_LrbIVTDJU9kR-NwS1UxWD2lTVdY"
-DATABASE_SCHEMA_DIR = "/path/to/database_schema"
-DATABASE_PATH = "/path/to/database.sqlite3"
+BASE_DIR = pathlib.Path("{path.as_posix()}")
 
-router = Router(
-    # routing setup
+SECRETS_DIR = BASE_DIR / "secrets"
+DATABASE_SCHEMA_DIR = BASE_DIR / "database_schema"
+DATABASE_PATH = BASE_DIR / "database.sqlite3"
+CLOUD_FOLDER = BASE_DIR / "cloud"
+
+setup = Setup(
+    # Routing models & views
     mapping={
-        'signup': views.signup,
-        'login': views.login,
-        'create_owner': views.create_owner,
-        'create_folder': views.create_folder,
-        'write_file': views.write_file,
-        'delete_item': views.delete_item,
-        'read_file': views.read_file,
-        'read_tree': views.read_tree
+        # Views mapping goes here...
+        # You can use Fluxon.Routing.dynamic_views_loading as well
     },
-    # server setup
-    private_key=SERVER_SECURITY_KEY,
+    models=models,
+
+    # Server setup
+    secrets=Secrets(SECRETS_DIR),
     database_schema_dir=DATABASE_SCHEMA_DIR,
     database_path=DATABASE_PATH,
-    models=cloud_models # make sure to map the models to "cloud_models.py"
+    database_api=AsyncSQLiteDatabase,
+
+    # Cloud storage setup
+    cloud_folder=CLOUD_FOLDER,
+    cloud_auth_model=CloudAuthenticationModel
 )
 ```
 
-```cloud_models.py``` will collect the models for both servers and pass them to the router, and then the main server takes the models directly from the router to work with them. This way, the server can keep track of all your models and tables effectively.
-
-Here is a possible ```cloud_models.py``` setup, you can go super fancy with it if you want. (I will write other sets of models for the cloud server and more operation flags for different operations in the future)
+Write your authentication models in `authentication_model.py`, you will find an automatically generated one that looks like so:
 
 ```python
-from Fluxon.Database import Models
+from Fluxon.Cloud.AuthorizationModels import RoleBasedAccessControl, Permissions, DefaultRole, AnonymousPermissions
+
+# Write as many authentication models as you want
+# You can Alternate between models in "router.py"
+
+class CloudAuthenticationModel(RoleBasedAccessControl):
+    # Roles and permissions definition goes here...
+    class owner(RoleBasedAccessControl.Role):
+        permissions=[
+            Permissions.CREATE_FILE,
+            Permissions.READ_FILE,
+            Permissions.WRITE_FILE,
+            Permissions.DELETE_FILE,
+            Permissions.CREATE_SUB_DIRECTORY,
+            Permissions.DELETE_SUB_DIRECTORY,
+            Permissions.READ_TREE_DIRECTORY
+        ]
+
+    class collaborator(RoleBasedAccessControl.Role):
+        permissions=[
+            Permissions.READ_FILE,
+            Permissions.WRITE_FILE,
+            Permissions.READ_TREE_DIRECTORY,
+            Permissions.CREATE_FILE
+        ]
+
+    class viewer(RoleBasedAccessControl.Role):
+        permissions=[
+            Permissions.READ_FILE,
+            Permissions.READ_TREE_DIRECTORY
+        ]
+
+    # Set default role as viewer
+    DefaultRole(viewer)
+    AnonymousPermissions(
+        permissions=[
+            # Anonymous users get zero permissions
+        ]
+    )
+```
+
+The `CloudAuthenticationModel` implements a **role-based access control (RBAC)** system. To define roles, subclass `RoleBasedAccessControl` and declare nested classes inheriting from `RoleBasedAccessControl.Role`. Each role specifies a `permissions` list using the `Permissions` enum (e.g., `Permissions.READ_FILE`). Available permissions include:  
+- `CREATE_FILE`
+- `READ_FILE`
+- `WRITE_FILE`
+- `DELETE_FILE`
+- `CREATE_SUB_DIRECTORY`
+- `DELETE_SUB_DIRECTORY`
+- `READ_TREE_DIRECTORY`
+- `ASSIGN_ROLES` *allows the role with this permission to assign roles to other users for the file/folder*
+
++ **Subdirectories and files inherit parent roles if children roles were not specified**
++ **Assigned roles for subdirectories and files overrides parents permissions, untill this sub-role is removed**
+
+Assign a default role with `DefaultRole(YourRoleClass)` to handle unauthenticated users with explicit roles. Configure anonymous access via `AnonymousPermissions(permissions=[...])`—which by default (in this example), no permissions are granted. Integrate this model in `router.py` by importing and activating it in the routing configuration `cloud_auth_model` (take a look at the previous `router.py` example for 
+more context).
+
+You can manage roles and permissions directly from `views.py`, here are two simple example to views/cloud interactions and dynamics:
+```python
+from authentication_model import CloudAuthenticationModel
 from models import User
+from Fluxon.Database.Manipulations import where
 
-class Owner(Models.Model):
-    user = Models.OneToOneField(User, on_delete=Models.CASCADE)
-    storage_limit = Models.BigIntegerField(default=10 * 1024 * 1024 * 1024)
-
-class Directory(Models.Model):
-    name = Models.CharField(max_length=255)
-    directory = Models.ForeignKey('Directory', on_delete=Models.CASCADE)
-    owner = Models.ForeignKey(Owner, on_delete=Models.CASCADE)
-    created_at = Models.DateTimeField(auto_now_add=True)
-
-class File(Models.Model):
-    name = Models.CharField(max_length=255)
-    directory = Models.ForeignKey(Directory, on_delete=Models.CASCADE)
-    owner = Models.ForeignKey(Owner, on_delete=Models.CASCADE)
-    size = Models.BigIntegerField()
-    file_type = Models.CharField(max_length=50)
-    created_at = Models.DateTimeField(auto_now_add=True)
-    updated_at = Models.DateTimeField(auto_now=True)
-
-class FileMetadata(Models.Model):
-    file = Models.OneToOneField(File, on_delete=Models.CASCADE)
-    is_encrypted = Models.BooleanField(default=False)
-    encryption_algorithm = Models.CharField(max_length=100, null=True)
-    last_accessed_at = Models.DateTimeField(auto_now=True)
-```
-
-And here is a good starting point for ```cloud_views.py```
-
-```python
-from Fluxon.Database.Manipulations import AsyncSQLiteDatabase
-import pathlib, os
-
-async_db = AsyncSQLiteDatabase("path/to/database.sqlite3")
-cloud_folder = "path/to/cloud_folder"
-
-async def signup(request):
-    id = await async_db.User.Insert(request.payload)
-    if id:
-        return request.login(id)
-    else:
-        return False
-
-async def login(request):
-    query = (await async_db.User.Check(async_db.where[
-        (async_db.User.username == request.payload['username']) & (async_db.User.password == request.payload['password'])
-    ], fetch=1, columns=['id']))
-    if query:
-        id_ = query[0][0]
-        return request.login(id_)
-    else:
-        return False
-
-async def create_owner(request):
-    if request.userid: # signed in
-        rowid = await async_db.Owner.Insert({
-            'user': request.userid,
-            'storage_limit': 10 * 1024 * 1024 # 10 GB
-        })
-        # create a root directory for each user
-        if rowid:
-            username = (await async_db.User.Check(async_db.where[async_db.User.id == request.userid], fetch=1, columns=['username']))[0][0]
-            request.grant_access(
-                granted_operation=request.cloud_operations.create_directory, # as you can see operation flags are all encapsulated in the request itself for simplicity along side the basic `grant_access` authorization method. (enhanced access control features on the way!!)
-                cloud_relative_path=username
-            )
-            return {
-                "granted_operation": request.cloud_operations.create_directory,
-                "cloud_path": username
-            }
+async def assign_user_as_viewer(request):
+    if request.user:
+        # payload
+        user_to_assign = request.payload['user_to_assign']
+        authorized_cloud_relative_path = request.payload['path']
+        # authorization
+        if CloudAuthenticationModel.can_authorize_path(    # if the user role on this path does not have a `Permissions.ASSIGN_ROLES` permission, `can_authorize_path` will return `False`
+            path=authorized_cloud_relative_path, user=request.user
+        ):
+            # assign role
+            if query := await User.Check(where[User.username == user_to_assign], fetch=1, columns=[User.id]):
+                user_id = query[0][0]   # -> [first result][first column (the "id" basically)]
+                status = CloudAuthenticationModel.assign_user_role(
+                    role=CloudAuthenticationModel.viewer,
+                    user_id=user_id,   # | you can use `user`, `user_id`, and 'username' to indentify users in cloud interactions
+                    path=authorized_cloud_relative_path
+                )
+                return status
+            else:
+                return {"response": f"user {user_to_assign} not found"}
         else:
-            return "Unable to create owner"
-    else: return "login required"
+            return {"response": f"you can't authorize users to this path ({authorized_cloud_relative_path})"}
+    else:
+        return {"response": "login needed"}
 
-async def create_folder(request): # create folder on cloud
-    if request.userid: # signed in
-        access_granted = True
-        folder_path = pathlib.Path(request.payload['path'])
-        query = (await async_db.Owner.Check(async_db.where[async_db.Owner.user == request.userid], fetch=1, columns=["id"]))
-        if query:
-            owner_id = query[0][0]
-            # 1 check root owner
-            root_parent = ((str(folder_path.parents[len(folder_path.parents) - 2])).replace('\\','')).replace('/','')
-            query_2 = (await async_db.Directory.Check(async_db.where[(async_db.Directory.name == root_parent) & (async_db.Directory.directory == None)], fetch=1, columns=['owner']))
-            if query_2:
-                root_owner_id = query_2[0][0]
-                if owner_id != root_owner_id:
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: User does not have ownership of the root directory '{root_parent}'."
-            else:
-                return f"root folder not found {root_parent}"
-            # 2 check folder parent exists
-            if access_granted:
-                if not pathlib.Path(os.path.join(cloud_folder, folder_path)).parent.exists():
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: The parent directory '{folder_path.parent}' does not exist."
-            # 3 check folder doesn't exist
-            if access_granted:
-                if pathlib.Path(os.path.join(cloud_folder, folder_path)).exists():
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: The folder '{folder_path}' already exists."
-            if access_granted:
-                request.grant_access(
-                    granted_operation=request.cloud_operations.create_directory,
-                    cloud_relative_path=str(folder_path)
-                )
-                return {
-                    "granted_operation": request.cloud_operations.create_directory,
-                    "cloud_path": str(folder_path)
-                }
-            else: return access_denied_message
-        return "authentication Failed; unregistered owner"
-    else: return "login required"
-
-async def write_file(request):
-    if request.userid: # signed in
-        access_granted = True
-        file_path = pathlib.Path(request.payload['path'])
-        query = (await async_db.Owner.Check(async_db.where[async_db.Owner.user == request.userid], fetch=1, columns=["id"]))
-        if query:
-            owner_id = query[0][0]
-            # 1 check root owner
-            root_parent = ((str(file_path.parents[len(file_path.parents) - 2])).replace('\\','')).replace('/','')
-            query_2 = (await async_db.Directory.Check(async_db.where[(async_db.Directory.name == root_parent) & (async_db.Directory.directory == None)], fetch=1, columns=['owner']))
-            if query_2:
-                root_owner_id = query_2[0][0]
-                if owner_id != root_owner_id:
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: User does not have ownership of the root directory '{root_parent}'."
-            else:
-                return f"root folder not found {root_parent}"
-            # 2 check folder parent exists
-            if access_granted:
-                if not pathlib.Path(os.path.join(cloud_folder, file_path)).parent.exists():
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: The parent directory '{file_path.parent}' does not exist."
-
-            if access_granted:
-                request.grant_access(
-                    granted_operation=request.cloud_operations.write_file,
-                    cloud_relative_path=str(file_path)
-                )
-                return {
-                    "granted_operation": request.cloud_operations.write_file,
-                    "cloud_path": str(file_path)
-                }
-            else: return access_denied_message
-        return "authentication Failed; unregistered owner"
-    else: return "login required"
-
-async def delete_item(request):
-    if request.userid: # signed in
-        access_granted = True
-        file_path = pathlib.Path(request.payload['path'])
-        query = (await async_db.Owner.Check(async_db.where[async_db.Owner.user == request.userid], fetch=1, columns=["id"]))
-        if query:
-            owner_id = query[0][0]
-            # 1 check root owner
-            root_parent = ((str(file_path.parents[len(file_path.parents) - 2])).replace('\\','')).replace('/','')
-            query_2 = (await async_db.Directory.Check(async_db.where[(async_db.Directory.name == root_parent) & (async_db.Directory.directory == None)], fetch=1, columns=['owner']))
-            if query_2:
-                root_owner_id = query_2[0][0]
-                if owner_id != root_owner_id:
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: User does not have ownership of the root directory '{root_parent}'."
-            else:
-                return f"root folder not found {root_parent}"
-            # 2 check item exists
-            if access_granted:
-                if not pathlib.Path(os.path.join(cloud_folder, file_path)).exists():
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: Item '{file_path}' does not exist."
-
-            if access_granted:
-                request.grant_access(
-                    granted_operation=request.cloud_operations.delete_item,
-                    cloud_relative_path=str(file_path)
-                )
-                return {
-                    "granted_operation": request.cloud_operations.delete_item,
-                    "cloud_path": str(file_path)
-                }
-            else: return access_denied_message
-        return "authentication Failed; unregistered owner"
-    else: return "login required"
-
-async def read_file(request):
-    if request.userid: # signed in
-        access_granted = True
-        file_path = pathlib.Path(request.payload['path'])
-        query = (await async_db.Owner.Check(async_db.where[async_db.Owner.user == request.userid], fetch=1, columns=["id"]))
-        if query:
-            owner_id = query[0][0]
-            # 1 check root owner
-            root_parent = ((str(file_path.parents[len(file_path.parents) - 2])).replace('\\','')).replace('/','')
-            query_2 = (await async_db.Directory.Check(async_db.where[(async_db.Directory.name == root_parent) & (async_db.Directory.directory == None)], fetch=1, columns=['owner']))
-            if query_2:
-                root_owner_id = query_2[0][0]
-                if owner_id != root_owner_id:
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: User does not have ownership of the root directory '{root_parent}'."
-            else:
-                return f"root folder not found {root_parent}"
-            # 2 check file exists
-            if access_granted:
-                if not pathlib.Path(os.path.join(cloud_folder, file_path)).is_file():
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: file '{file_path}' does not exist."
-
-            if access_granted:
-                request.grant_access(
-                    granted_operation=request.cloud_operations.read_file,
-                    cloud_relative_path=str(file_path)
-                )
-                return {
-                    "granted_operation": request.cloud_operations.read_file,
-                    "cloud_path": str(file_path)
-                }
-            else: return access_denied_message
-        return "authentication Failed; unregistered owner"
-    else: return "login required"
-
-async def read_tree(request):
-    if request.userid: # signed in
-        access_granted = True
-        folder_path = pathlib.Path(request.payload['path'])
-        query = (await async_db.Owner.Check(async_db.where[async_db.Owner.user == request.userid], fetch=1, columns=["id"]))
-        if query:
-            owner_id = query[0][0]
-            # 1 check root owner
-            root_parent = ((str(folder_path.parents[len(folder_path.parents) - 2])).replace('\\','')).replace('/','')
-            query_2 = (await async_db.Directory.Check(async_db.where[(async_db.Directory.name == root_parent) & (async_db.Directory.directory == None)], fetch=1, columns=['owner']))
-            if query_2:
-                root_owner_id = query_2[0][0]
-                if owner_id != root_owner_id:
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: User does not have ownership of the root directory '{root_parent}'."
-            else:
-                return f"root folder not found {root_parent}"
-            # 2 check folder parent exists
-            if access_granted:
-                if not pathlib.Path(os.path.join(cloud_folder, folder_path)).parent.exists():
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: The parent directory '{folder_path.parent}' does not exist."
-            # 3 check folder exist
-            if access_granted:
-                if not pathlib.Path(os.path.join(cloud_folder, folder_path)).is_dir():
-                    access_granted = False
-                    access_denied_message = f"AccessDenied: The folder '{folder_path}' does not exists."
-            if access_granted:
-                request.grant_access(
-                    granted_operation=request.cloud_operations.read_tree,
-                    cloud_relative_path=str(folder_path)
-                )
-                return {
-                    "granted_operation": request.cloud_operations.read_tree,
-                    "cloud_path": str(folder_path)
-                }
-            else: return access_denied_message
-        return "authentication Failed; unregistered owner"
-    else: return "login required"
-```
-
-The code sets the bases of how to authorize users to the cloud server. Use ```request.grant_access``` to authorize users to specific cloud operations, you can see the different flags for different operations like creating a folder, or writing a file, etc...
-
-And here's how things look like on the client side
-
-```python
-from Fluxon.Connect import ConnectionHandler, CloudStorageConnector
-
-conn = ConnectionHandler('192.168.1.6', 8080)
-cloud = CloudStorageConnector('192.168.1.6', 8888)
-
-# login request
-response = conn.send_request("login", {
-    "username": "Jack",
-    "password": "Jack@123",
-    "email": "Jack@gmail.com"
-})
-
-file_to_upload = "path/to/file"
-cloud_relative_path = "username/path/to/file"
-
-# each cloud-related request returns a specifically tailored cloud request for your operation
-cloud_request = conn.send_request("write_file", {"path": cloud_relative_path})
-# redirect the request, coupled with the main server session_id, to perform different cloud operations
-with open(file_to_upload, 'rb') as file:
-    cloud_response = cloud.send_request(cloud_request, conn.sessionid, payload=file.read())
-
-# deleting a file
-cloud_request = conn.send_request("delete_item", {"path": cloud_relative_path})
-cloud_response = cloud.send_request(cloud_request, conn.sessionid)
-
-# creating a directory
-cloud_request = conn.send_request("create_folder", {"path": cloud_relative_path})
-cloud_response = cloud.send_request(cloud_request, conn.sessionid)
+async def assign_me_as_owner(request):
+    if request.user:
+        cloud_relative_path = request.payload['path']
+        # In this example, 'owner' role is granted to the creator of the file only
+        if CloudAuthenticationModel.filesystem.path(cloud_relative_path).creator.id == request.user.id:
+            status = CloudAuthenticationModel.assign_user_role(CloudAuthenticationModel.owner, user=request.user)
+            return status
+        else:
+            return {"response": "you didn't create this file, so you will not be assigned as the 'owner'"}
+    else:
+        return {"response": "login needed"}
 ```
 
 ---
