@@ -35,8 +35,8 @@ pip install Fluxon
 ## Getting Started
 
 ### Setting up The Server
-**You can run this command `python -m Fluxon.StartProject AsyncServer path/to/project` and your project including `server.py` and `router.py` setup, models and views files, a logging directory for your server, database schema directory and a security key will all be automatically generated for you :)
-These server templates will be expanded in the near future to include all the needed setups including a highly optimized HTTP server, FTP server, cloud storage integration, and different database system integrations other than SQLite.** You can also set the server manually as follows, Fluxon is highly flexible with server setups.
+**You can run this command `python -m Fluxon.StartProject AsyncServer path/to/project` and your project including `server.py` and `router.py` setup, models and views files, a logging directory for your server, database schema directory and a self-signed security key will all be automatically generated for you :)
+These server templates will be expanded in the near future to include all the needed setups including a highly optimized HTTP server endpoint, FTP server endpoint, with cloud storage integration, and different database system integrations other than SQLite.** You can also set the server manually as follows, Fluxon is highly flexible with server setups.
 
 Setting up the server is pretty simple. First you pick your favorite server from ```Fluxon.Endpoint```, let's say you happened to choose ```AsyncServer``` as your main Endpoint for your application (which is the only one available right now, more on the way tho)
 
@@ -44,6 +44,8 @@ write this in your ```server.py```
 ```python
 from Fluxon.Endpoint import AsyncServer, run_server
 import router
+
+# Welcome to Fluxon!
 
 server = run_server(AsyncServer(
     port=8080, secure=False,
@@ -55,49 +57,50 @@ server = run_server(AsyncServer(
 
 You can also equip the server with a built-in highly-optimized cloud storage server, but it requires a complex setup and authorization mechanism. We'll talk about it in a second.
 
-```python
-from Fluxon.Endpoint import AsyncServer, CloudStorageServer, run_server
-import router
-
-cloud_folder = "/path/to/cloud_folder"
-
-server = run_server(AsyncServer(
-    port=8080, secure=False,
-    router=router.router,
-    # cloud storage setup
-    cloud_storage=CloudStorageServer(
-        port=8888, secure=False,
-        cloud_folder=cloud_folder
-    )
-))
-```
-
 ---
 
 ### Router Setup
 The `Router` handles all incoming requests and maps them to appropriate views.
 
-and this is ```router.py``` that we used in ```server.py```
+And this is ```router.py``` that we used in ```server.py```
 ```python
-from Fluxon.Routing import Router
-import models, views
+import pathlib
+from Fluxon.Routing import Setup
+from Fluxon.Database.Manipulations import AsyncSQLiteDatabase
+from Fluxon.Security import Secrets
+import views, models
 
-SERVER_SECURITY_KEY = "RsxZd5wVVml7C0H_LrbIVTDJU9kR-NwS1UxWD2lTVdY"
-DATABASE_SCHEMA_DIR = "path/to/database_schema"
-DATABASE_PATH = "path/to/database.sqlite3"
+BASE_DIR = pathlib.Path("automatically_generated/path/to/project")
 
-router = Router(
-    # routing setup
-    mapping={
-        "signup": views.signup
-    },
-    # server setup
-    private_key=SERVER_SECURITY_KEY,
+SECRETS_DIR = BASE_DIR / "secrets"   # secrets directory contain automatically generated self-signed server key and certificate, which is convenient for testing and development
+DATABASE_SCHEMA_DIR = BASE_DIR / "database_schema"
+DATABASE_PATH = BASE_DIR / "database.sqlite3"
+
+setup = Setup(
+    # Routing models & views
+    mapping={{
+        # Views mapping goes here...
+        # You can use Fluxon.Routing.dynamic_views_loading as well
+    }},
+    models=models,
+
+    # Server setup
+    secrets=Secrets(SECRETS_DIR),
     database_schema_dir=DATABASE_SCHEMA_DIR,
     database_path=DATABASE_PATH,
-    models=models
+    database_api=AsyncSQLiteDatabase,
 )
 ```
+
+The `Setup` class centralizes routing, security, and database configurations. Define paths using `pathlib.Path` for critical directories like `SECRETS_DIR` and `DATABASE_SCHEMA_DIR` (contains SQL schema files). The `Setup` constructor accepts:  
+- `mapping`: A dictionary linking URL routes to view handlers, you can also use `mapping=Fluxon.Routing.dynamic_views_loading(view)` to load all the functions in the `views` module to the router mapping (use it only when experimenting and testing different views; hardcode them when you're done).
+- `models`: Models for database integration.
+- `secrets`: A `Secrets` instance managing TLS certificates/keys and certificates
+- `database_schema_dir`: Path to SQL schema migration files  
+- `database_path`: Target file for the SQLite database *(other server-based databases will require access credentials instead)*
+- `database_api`: Database engine adapter (e.g., `SQLiteDatabase`, `AsyncSQLiteDatabase`, etc)  
+
+Initialize the setup object after importing project-specific `views` and `models`. Paths like `BASE_DIR` are auto-generated but can be overridden. For development, `Secrets` automatically creates self-signed certificates in `SECRETS_DIR`. Activate the configuration by passing the `setup` instance to your framework’s runtime entrypoint.  
 
 ---
 
@@ -141,7 +144,7 @@ class Enrollment(Models.Model):
     date_enrolled = Models.DateField(auto_now_add=True)
 ```
 
-+ **You should use a ```Models.AuthorizedUser``` model only once!**
++ **You should use a ```Models.AuthorizedUser``` model only once!!**
 
 #### 2. **Saving and Updating Database Schema**
 Once the models are defined, you can save the schema, which Fluxon will translate into SQL queries. These queries will be stored as ```.sql``` files in your defined schema directory. This translation ensures that your models are reflected as actual SQL tables in your database.
@@ -149,37 +152,23 @@ Once the models are defined, you can save the schema, which Fluxon will translat
 saving schema is straightforward, type ```saveschema``` in the interactive server console, and the models you wrote will be automatically saved, loading that schema involved typing ```updateschema (schema number)``` in the server console. This should make alternating between schemas much easier.
 
 #### 3. **Data Manipulations and Database Interactions**
-Once the schema is set, Fluxon allows you to easily manipulate your data using ```Fluxon.Database.Manipulations.SqliteDatabase```, which is responsible for performing CRUD (Create, Read, Update, Delete) operations on your SQLite database.
-
-```python
-from Fluxon.Database.Manipulations import SqliteDatabase
-
-db = SqliteDatabase("path/to/database_file")
-```
-
-Or you can use ```AsyncSqliteDatabase``` for full I/O support and non-blocking flow. Asynchronous database handling requires writing asynchronous views, which is not a bad idea at all. This version uses connection pooling to optimize database performance and avoid blocking. It also manages concurrent sql writing operations without locking the database file. (just use ```AsyncSqliteDatabase``` man)
-
-```python
-from Fluxon.Database.Manipulations import AsyncSqliteDatabase
-
-async_db = AsyncSqliteDatabase("path/to/database_file")
-```
+Once the schema is set, Fluxon allows you to easily manipulate your data using ```Fluxon.Database.Manipulations.AsyncSqliteDatabase```, which is responsible for performing CRUD (Create, Read, Update, Delete) operations under the hood on your SQLite database. `AsyncSqliteDatabase` provides full I/O support and non-blocking flow. Asynchronous database handling requires writing asynchronous views, which is not a bad idea at all. This version uses connection pooling to optimize database performance and avoid blocking. It also manages concurrent sql writing operations without locking the database file.
 
 - **Inserting Data:**
 
 ```python
-db.User.Insert({
-    db.User.username: "username",
-    db.User.password: "password"
+await User.Insert({
+    User.username: "username",
+    User.password: "password"
 })
 ```
 
-And here is an example for an ```AsyncSqliteDatabase``` implementation:
+And here is an example for ```SqliteDatabase``` implementation:
 
 ```python
-await async_db.User.Insert({
-    db.User.username: "username",
-    db.User.password: "password"
+User.Insert({
+    User.username: "username",
+    User.password: "password"
 })
 ```
 
@@ -188,13 +177,13 @@ The ```Insert``` query should automatically return the id of the inserted row, r
 - **Updating Data:**
 
 ```python 
-db.User.Update({db.User.email: "newemail@example.com"}, db.where[db.User.username == "filtering by username"])
+User.Update({User.email: "newemail@example.com"}, where[User.username == "filtering by username"])
 ```
 
-And this is how an async version look like, just remember to write async views
+And this is how an synchronous version looks like
 
 ```python 
-await async_db.User.Update({db.User.email: "newemail@example.com"}, db.where[db.User.username == "filtering by username"])
+User.Update({User.email: "newemail@example.com"}, where[User.username == "filtering by username"])
 ```
 
 where statement accepts logical operators and ```&``` or ```|```
@@ -202,27 +191,20 @@ where statement accepts logical operators and ```&``` or ```|```
 - **Querying Data:**
   
 ```python
-users = db.User.Check(db.where[db.User.username == "name"], fetch=number_of_results)
-```
-
-```python
-users = await async_db.User.Check(db.where[db.User.username == "name"], fetch=number_of_results)
+users = await User.Check(where[User.username == "name"], fetch=number_of_results)
 ```
   
-you can also drop the fetch argument to get all the data filtered using where statement
++ you can also drop the fetch argument to get a `True` or `False` result to validate a rows's existance in an if statement if you need.
++ set `fetch='*'` to grab all the results that fulfill the `where` statement.
 
 - **Deleting Data:**
-  
-```python
-db.User.Delete(where[db.User.id == 3])
-```
 
 ```python
-await db.User.Delete(where[db.User.id == 3])
+await User.Delete(where[User.id == 3])
 ```
++ **`await User.Delete()` deletes everything, so be careful!**
 
-Here is the thing tho, always add `await` before calling an asynchronous function, that way you're telling python to alternate between tasks and eliminate any I/O-related blocking 
-(what am I sayin, you gon do it either way. the system crashes without awaiting coroutines bro)
+Here is the thing tho, always add `await` before calling an asynchronous function, including all `AsyncSQLiteDatabase` interactions, that way you're telling python to alternate between tasks and eliminate any I/O-related blocking.
 
 ---
 
@@ -233,20 +215,11 @@ Example signup view from ```views.py```:
 
 ```python
 def signup(request):
-    User.Insert(request.pyload)
+    User.Insert(request.pyload)  # using `SqliteDatabase` here
     return {"status": "200", "message": "Signed up successfully"}
 ```
 
-And here is an asynchronous version of the same function (which is optimized for I/O systems, like the server we're working with right now)
-
-```python
-async def signup(request):
-    """asynchronous view functions introduce way less blocking than synchronous ones"""
-    await User.Insert(request.pyload)
-    return {"status": "200", "message": "Signed up successfully"}
-```
-
-The request passed to the view is a ```Fluxon.Routing.Request``` object that contains the client's peername, session id, user id, the request payload, the connection object used by the server, and all the data you need. All requests passed are authenticated, you can authorize users (bind them to a user, which is supposed to be a Model.AuthorizedUser sub-class) using requests.login(user_id)
+The request passed to the view is a ```Fluxon.Routing.Request``` object that contains the client's peername, session id, user, the request payload, the connection object used by the server, and all the data you need. All requests passed are authenticated, you can authorize users (bind them to a user, which is supposed to be a Model.AuthorizedUser sub-class) using requests.login(user_id)
 
 ---
 
@@ -292,8 +265,8 @@ This is the view for sending a message and making a reverse request. Write this 
 ```python
 async def send_message(request):
     if request.userid:
-        sender = (await db.User.Check(db.where[db.User.id == request.userid], fetch=1, columns=['username']))[0][0]
-        query = await db.User.Check(db.where[db.User.username == request.payload["to"]], fetch=1, columns=["id"])
+        sender = (await User.Check(where[User.id == request.userid], fetch=1, columns=[User.username]))[0][0]
+        query = await User.Check(where[User.username == request.payload["to"]], fetch=1, columns=["id"])
         if query:
             id = query[0][0]
             # reverse_request takes the userid of the requested user, the name of the function triggered, and the payload passed to that function.
@@ -401,6 +374,8 @@ setup = Setup(
 )
 ```
 
+---
+
 Write your authentication models in `authentication_model.py`, you will find an automatically generated one that looks like so:
 
 ```python
@@ -461,6 +436,8 @@ The `CloudAuthenticationModel` implements a **role-based access control (RBAC)**
 Assign a default role with `DefaultRole(YourRoleClass)` to handle unauthenticated users with explicit roles. Configure anonymous access via `AnonymousPermissions(permissions=[...])`—which by default (in this example), no permissions are granted. Integrate this model in `router.py` by importing and activating it in the routing configuration `cloud_auth_model` (take a look at the previous `router.py` example for 
 more context).
 
+---
+
 You can manage roles and permissions directly from `views.py`, here are two simple example to views/cloud interactions and dynamics:
 ```python
 from authentication_model import CloudAuthenticationModel
@@ -503,6 +480,36 @@ async def assign_me_as_owner(request):
             return {"response": "you didn't create this file, so you will not be assigned as the 'owner'"}
     else:
         return {"response": "login needed"}
+```
+
+---
+
+And here is how the client interacts with them:
+
+```python
+from Fluxon.Connect import ConnectionHandler, CloudStorageConnector
+
+# starting the connection
+server_connection = ConnectionHandler(host='localhost', port=8080)
+cloud_connection = CloudStorageConnector(host='localhost', port=8888)
+
+# logging in
+server_connection.send_request("login", {
+    'username': "Jane",
+    'password': "Jane123@abc"
+})
+
+# creating a directry in the cloud root dir
+cloud_response = cloud_connection.create_directory(relative_path="/janes_dir")
+
+# claim ownership
+response = server_connection.send_request("assign_me_as_owner", {'path': "/janes_dir"})
+
+cloud_response = cloud_connection.create_file(relative_path="/janes_dir/some_file.txt") # no need to claim ownership, the user inherits it from the parent directory `/janes_dir`
+cloud_response = cloud_connection.write_file(relative_path="/janes_dir/some_file.txt", data=b"some text... 123, some more text @#$abc") # no need to claim ownership, the user inherits it from the parent directory `/janes_dir`
+
+# assign Mike as a viewer to `/janes_dir/some_file.txt`. she can since she's assigned as 'owner' to the file, and the role 'owner' has `ASSIGN_ROLE` in its permissions 
+response = server_connection.send_request("assign_user_as_viewer", {'user_to_assign': "Mike", 'path': "/janes_dir"})
 ```
 
 ---
