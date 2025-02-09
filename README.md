@@ -386,7 +386,7 @@ from Fluxon.Security import Secrets
 from authentication_model import CloudAuthenticationModel
 import views, models
 
-BASE_DIR = pathlib.Path("{path.as_posix()}")
+BASE_DIR = pathlib.Path("automatically_generated/path/to/project")
 
 SECRETS_DIR = BASE_DIR / "secrets"
 DATABASE_SCHEMA_DIR = BASE_DIR / "database_schema"
