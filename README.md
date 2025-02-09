@@ -417,7 +417,7 @@ Write your authentication models in `authentication_model.py`, you will find an 
 from Fluxon.Cloud.AuthorizationModels import RoleBasedAccessControl, Permissions, DefaultRole, AnonymousPermissions
 
 # Write as many authentication models as you want
-# You can Alternate between models in "router.py"
+# You can alternate between models in "router.py"
 
 class CloudAuthenticationModel(RoleBasedAccessControl):
     # Roles and permissions definition goes here...
@@ -463,7 +463,7 @@ The `CloudAuthenticationModel` implements a **role-based access control (RBAC)**
 - `CREATE_SUB_DIRECTORY`
 - `DELETE_SUB_DIRECTORY`
 - `READ_TREE_DIRECTORY`
-- `ASSIGN_ROLES` *allows the role with this permission to assign roles to other users for the file/folder*
+- `ASSIGN_ROLES` *allows the role with this permission to assign roles to other users to file/folder*
 
 + **Subdirectories and files inherit parent roles if children roles were not specified**
 + **Assigned roles for subdirectories and files overrides parents permissions, untill this sub-role is removed**
