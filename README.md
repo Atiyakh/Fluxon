@@ -45,8 +45,6 @@ write this in your ```server.py```
 from Fluxon.Endpoint import AsyncServer, run_server
 import router
 
-# Welcome to Fluxon!
-
 server = run_server(AsyncServer(
     port=8080, secure=False,
     router=router.router
@@ -362,8 +360,6 @@ That's your new ```server.py``` with a `CloudStorageServer` integration (I will 
 ```python
 from Fluxon.Endpoint import AsyncServer, CloudStorageServer, run_server
 import router
-
-# Welcome to Fluxon!
 
 run_server(AsyncServer(
     port=8080, secure=False,
