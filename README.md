@@ -468,7 +468,7 @@ The `CloudAuthenticationModel` implements a **role-based access control (RBAC)**
 + **Subdirectories and files inherit parent roles if children roles were not specified**
 + **Assigned roles for subdirectories and files overrides parents permissions, untill this sub-role is removed**
 
-Assign a default role with `DefaultRole(YourRoleClass)` to handle unauthenticated users with explicit roles. Configure anonymous access via `AnonymousPermissions(permissions=[...])`—which by default (in this example), no permissions are granted. Integrate this model in `router.py` by importing and activating it in the routing configuration `cloud_auth_model` (take a look at the previous `router.py` example for 
+Assign a default role with `DefaultRole(YourRoleClass)` to handle unauthenticated users with explicit roles. Configure anonymous access via `AnonymousPermissions(permissions=[...])`—which by default (in this example), has no permissions at all. Integrate this model in `router.py` by importing and simply passing it in the routing configuration `cloud_auth_model` (take a look at the previous `router.py` example for 
 more context).
 
 ---
