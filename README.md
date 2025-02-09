@@ -534,7 +534,7 @@ server_connection.send_request("login", {
     'password': "Jane123@abc"
 })
 
-# creating a directry in the cloud root dir
+# creating a directory in the cloud root dir
 cloud_response = cloud_connection.create_directory(relative_path="/janes_dir")
 
 # claim ownership
