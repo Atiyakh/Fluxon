@@ -518,7 +518,7 @@ async def assign_me_as_owner(request):
 ```
 ---
 ***The same models we worked with in the beginning will be automatically connection with the RBAC models like in this diagram***
-[](https://github.com/Atiyakh/Fluxon/blob/main/diagrams/cloud_integrated_models.png)
+![]([https://github.com/Atiyakh/Fluxon/blob/main/diagrams/cloud_integrated_models.png](https://raw.githubusercontent.com/Atiyakh/Fluxon/refs/heads/main/diagrams/cloud_integrated_models.png))
 ---
 
 And here is how the client interacts with them:
