@@ -1,6 +1,10 @@
 ⚠️ **WARNING: THIS PROJECT IS NOT FULLY IMPLEMENTED!** ⚠️  
-This repository is **under active development**, and some features (like fine-grained cloud permissions, ABAC integration, and advanced role management) **are NOT fully functional yet**.  
-Expect bugs, missing features, and unfinished implementations. **DO NOT use this in production yet!**  
+
+  This repository is **under active development**, and several features—such as fine-grained cloud permissions, ABAC integration, and advanced role management—**are NOT fully functional yet**.  
+  Expect **bugs, missing features, and unfinished implementations**. **DO NOT use this in production yet!**  
+
+  🚧 Some features mentioned in the README **will not be ready until tonight or tomorrow morning.**  
+
 
 
 # What is Fluxon?
