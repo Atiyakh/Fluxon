@@ -149,7 +149,9 @@ class Enrollment(Models.Model):
 
 ---
 
-+ **You should use a ```Models.AuthorizedUser``` model only once!!**
++ **`Models.AuthorizedUser` is mandatory for the cloud authentication model and session, connection, and authentication handling will not work as expected without it.**
++ **Fields `username` and `email` are mandatory. The default `id` (`AutoField`) is also mandatory in an `AuthorizedUser` model and must not be replaced with another primary key field. you CANNOT write more than one `AuthorizedUser` model. Otherwise, the most recent will override the others, and they will be deprecated**
++ **`Models.AuthorizedUser` must be explicitly defined in the code and will NOT be automatically generated or inferred. The autocode generator (`Fluxon.StartProject`) will write one called `User` by default**
 
 #### 2. **Saving and Updating Database Schema**
 Once the models are defined, you can save the schema, which Fluxon will translate into SQL queries. These queries will be stored as ```.sql``` files in your defined schema directory. This translation ensures that your models are reflected as actual SQL tables in your database.
@@ -519,6 +521,7 @@ async def assign_me_as_owner(request):
 ```
 ---
 #### **The same models we worked with in the beginning will be automatically integrated with the RBAC models like in this diagram**
+How does this work? It's all about the `Models.AuthorizedUser` model that centralized access control for the cloud server, session and authentication, and reverse requests for the main server.
 ---
 <p align="center">
   <img src="https://raw.githubusercontent.com/Atiyakh/Fluxon/refs/heads/main/diagrams/cloud_integrated_models.png" alt="cloud_integrated_models.png">
