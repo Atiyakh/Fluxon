@@ -182,13 +182,7 @@ The ```Insert``` query should automatically return the id of the inserted row, r
 - **Updating Data:**
 
 ```python 
-User.Update({User.email: "newemail@example.com"}, where[User.username == "filtering by username"])
-```
-
-And this is how an synchronous version looks like
-
-```python 
-User.Update({User.email: "newemail@example.com"}, where[User.username == "filtering by username"])
+await User.Update({User.email: "newemail@example.com"}, where[User.username == "filtering by username"])
 ```
 
 where statement accepts logical operators and ```&``` or ```|```
