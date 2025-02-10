@@ -1,3 +1,8 @@
+⚠️ **WARNING: THIS PROJECT IS NOT FULLY IMPLEMENTED!** ⚠️  
+This repository is **under active development**, and some features (like fine-grained cloud permissions, ABAC integration, and advanced role management) **are NOT fully functional yet**.  
+Expect bugs, missing features, and unfinished implementations. **DO NOT use this in production yet!**  
+
+
 # What is Fluxon?
 Fluxon is a lightweight general-purpose network engine written from scratch in Python. It offers secure communication, session handling, various server architectures and setups, and high-level database management making it an excellent choice for building server-side applications. (Some features will not be ready untill tonlight)
 
