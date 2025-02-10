@@ -141,6 +141,13 @@ class Enrollment(Models.Model):
     course = Models.ForeignKey(to_table=Course, on_delete=Models.CASCADE)
     date_enrolled = Models.DateField(auto_now_add=True)
 ```
+---
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Atiyakh/Fluxon/refs/heads/main/diagrams/school_models_example.png" alt="school_models_example">
+</p>
+
+
+---
 
 + **You should use a ```Models.AuthorizedUser``` model only once!!**
 
@@ -520,7 +527,7 @@ async def assign_me_as_owner(request):
 #### **The same models we worked with in the beginning will be automatically connection with the RBAC models like in this diagram**
 ---
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Atiyakh/Fluxon/refs/heads/main/diagrams/cloud_integrated_models.png" alt="Project Diagram">
+  <img src="https://raw.githubusercontent.com/Atiyakh/Fluxon/refs/heads/main/diagrams/cloud_integrated_models.png" alt="cloud_integrated_models.png">
 </p>
 
 ---
