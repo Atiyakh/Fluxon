@@ -517,7 +517,7 @@ async def assign_me_as_owner(request):
         return {"response": "login needed"}
 ```
 ---
-####**The same models we worked with in the beginning will be automatically connection with the RBAC models like in this diagram**
+#### **The same models we worked with in the beginning will be automatically connection with the RBAC models like in this diagram**
 ---
 ![cloud_integrated_models](https://github.com/Atiyakh/Fluxon/blob/main/diagrams/cloud_integrated_models.png)
 ---
