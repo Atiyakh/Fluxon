@@ -522,6 +522,7 @@ async def assign_me_as_owner(request):
 <p align="center">
   <img src="https://raw.githubusercontent.com/Atiyakh/Fluxon/refs/heads/main/diagrams/cloud_integrated_models.png" alt="Project Diagram">
 </p>
+
 ---
 
 And here is how the client interacts with them:
