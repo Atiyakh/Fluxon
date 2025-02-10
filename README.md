@@ -288,7 +288,7 @@ print(response)
 
 ### Running the Server
 
-Fluxon.Endpoint.run_server(<Fluxon.Endpoint.Server object>) is responsible for starting the server. Just run server.py—the instance is already passed to run_server.
+As we saw earlier, `Fluxon.Endpoint.run_server(<Fluxon.Endpoint.Server object>)` is responsible for starting the server. Just run `server.py`—the server instance is already passed to `run_server`.
 
 ```bash
 python server.py
