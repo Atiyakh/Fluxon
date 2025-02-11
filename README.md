@@ -531,7 +531,7 @@ async def assign_me_as_owner(request):
 ```
 ---
 ### **The same models we worked with in the beginning will be automatically integrated with the RBAC models like in this diagram**
-#### How does this work? It's all about the `Models.AuthorizedUser` model that centralized access control for the cloud server, session and authentication, and reverse requests for the main server.
+#### How does this work? It's all about the `Models.AuthorizedUser` model that centralizes access control for the cloud server, session and authentication, and reverse requests for the main server.
 ---
 <p align="center">
   <img src="https://raw.githubusercontent.com/Atiyakh/Fluxon/refs/heads/main/diagrams/cloud_integrated_models.png" alt="cloud_integrated_models.png">
