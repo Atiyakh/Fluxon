@@ -577,7 +577,6 @@ response = server_connection.send_request("assign_user_as_viewer", {'user_to_ass
 - **Integrated Cloud Storage System:** Built-in cloud storage support acts like a media system with unparalleled flexibility and server-side authorization.
 - **Database Integration:** Use a Django-inspired ORM to define models and manage schemas with SQLite for streamlined database operations.
 - **Secure Sessions:** Session-based authentication secured with private keys for robust communication.
-- **Python Object Serialization:** Effortlessly send and receive complex Python objects using `pickle`.
 - **Session Management:** Manage persistent client-server connections with advanced session handling.
 - **Asynchronous Support:** Optimized performance with async-ready components for servers, databases, and views. Fluxon native endpoints like `AsyncServer` significantly outperforms Flask and Django due to its end-to-end asynchronous architecture. (see [benchmark test results](https://github.com/Atiyakh/Fluxon/tree/main/benchmarks))
 
