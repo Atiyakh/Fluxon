@@ -1,6 +1,6 @@
 # Fluxon
 
-## 🚧 This project is currently in alpha.
+## 🚧 This project is currently in alpha. 🚧
 
 It is still under active development and not ready for production use.
 The structure, features, and APIs may change significantly without notice.
