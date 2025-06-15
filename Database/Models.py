@@ -1,7 +1,65 @@
+from Fluxon.Database.db_core_interface import Clause
 import datetime
+import warnings
+import types
 
-class Model: pass
-class Field: pass
+MODELS_INFO = dict()
+
+# abstract objects
+class Model:
+    MODELS_INFO = MODELS_INFO
+    # methods below are abstract and should be replaced automatically with DatabaseAPI CRUD functions 
+    def Check(where, fetch:int=None, columns:list=["*"]):
+        warnings.warn("- database API not loaded yet")
+    def Insert(**data):
+        warnings.warn("- database API not loaded yet")
+    def Delete(where):
+        warnings.warn("- database API not loaded yet")
+    def Update(where, **data):
+        warnings.warn("- database API not loaded yet")
+
+class Field:
+    def __hash__(self):
+        return id(self)
+
+    def parse(self, other):
+        if isinstance(other, types.NoneType):
+            return None
+        if isinstance(other, str):
+            other = other.replace('"', '""')
+            other = f'"{other}"'
+        elif isinstance(other, (datetime.date, datetime.time, datetime.datetime)):
+            other = f'"{str(other)}"'
+        return other
+
+    def __eq__(self, other):
+        other = self.parse(other)
+        if isinstance(other, types.NoneType):
+            return Clause(f"({self.column_name} IS NULL)")
+        return Clause(f"({self.column_name} = {other})")
+
+    def __ne__(self, other):
+        other = self.parse(other)
+        if isinstance(other, types.NoneType):
+            return Clause(f"({self.column_name} IS NOT NULL)")
+        return Clause(f"({self.column_name} != {other})")
+
+    def __lt__(self, other):
+        other = self.parse(other)
+        return Clause(f"({self.column_name} < {other})")
+
+    def __gt__(self, other):
+        other = self.parse(other)
+        return Clause(f"({self.column_name} > {other})")
+
+    def __le__(self, other):
+        other = self.parse(other)
+        return Clause(f"({self.column_name} <= {other})")
+
+    def __ge__(self, other):
+        other = self.parse(other)
+        return Clause(f"({self.column_name} >= {other})")
+
 class OnDelete: pass
 class CASCADE_(OnDelete): pass
 class PROTECT_(OnDelete): pass
@@ -43,10 +101,10 @@ class CharField(Field):
             "Invalid unique: unique should be a boolean value"
         )
 
-    def __sqltype__(self):
+    def __sqltype__(self, sqltype):
         return f"VARCHAR({self.max_length})"
 
-class AuthorizedUser(Model): pass
+class AuthenticatedUser(Model): ... # abstract class
 
 class TextField(Field):
     def __init__(self, unique:bool=False, primary_key:bool=False, null:bool=True):
@@ -66,7 +124,7 @@ class TextField(Field):
             "Invalid unique: unique should be a boolean value"
         )
     
-    def __sqltype__(self):
+    def __sqltype__(self, sqltype):
         return "TEXT"
 
 class IntegerField(Field):
@@ -96,8 +154,11 @@ class IntegerField(Field):
             "Invalid unique: unique should be a boolean value"
         )
     
-    def __sqltype__(self):
-        return "INTEGER"
+    def __sqltype__(self, sqltype):
+        if sqltype == 'MySQL':
+            return "INT"
+        elif sqltype == 'SQLite':
+            return "INTEGER"
 
 class BigIntegerField(Field):
     def __init__(self, default:int=None, null:bool=True, unique:bool=False, primary_key:bool=False):
@@ -126,8 +187,11 @@ class BigIntegerField(Field):
             "Invalid unique: unique should be a boolean value"
         )
 
-    def __sqltype__(self):
-        return "INTEGER" # !!! SqLite has no distinct BIGINT datatype, yet BIGINT is used as an alias for INTEGER
+    def __sqltype__(self, sqltype):
+        if sqltype == 'MySQL':
+            return "BIGINT"
+        elif sqltype == 'SQLite':
+            return "INTEGER"
 
 class PositiveIntegerField(Field):
     def __init__(self, default:int=None, null:bool=True, unique:bool=False, primary_key:bool=False):
@@ -160,8 +224,11 @@ class PositiveIntegerField(Field):
             "Invalid unique: unique should be a boolean value"
         )
 
-    def __sqltype__(self, col_name):
-        return f"INTEGER CHECK ({col_name} > 0)"
+    def __sqltype__(self, col_name, sqltype):
+        if sqltype == 'MySQL':
+            return f"INT CHECK ({col_name} > 0)"
+        elif sqltype == 'SQLite':
+            return f"INTEGER CHECK ({col_name} > 0)"
 
 class FloatField(Field):
     def __init__(self, default:int=None, null:bool=True, unique:bool=False, primary_key:bool=False):
@@ -190,7 +257,7 @@ class FloatField(Field):
             "Invalid unique: unique should be a boolean value"
         )
 
-    def __init__(self):
+    def __init__(self, sqltype):
         return "FLOAT"
 
 class DecimalField(Field):
@@ -238,7 +305,7 @@ class DecimalField(Field):
             "Invalid decimal_places: decimal_places should be an integer"
         )
 
-    def __sqltype__(self):
+    def __sqltype__(self, sqltype):
         return f"DECIMAL({self.max_digits}, {self.decimal_places})"
 
 class BooleanField(Field):
@@ -257,7 +324,7 @@ class BooleanField(Field):
         else: raise TypeError(
             "Invalid null: null should be a boolean value"
         )
-    def __sqltype__(self):
+    def __sqltype__(self, sqltype):
         return "BOOLEAN"
 
 class AutoField(Field):
@@ -270,11 +337,14 @@ class AutoField(Field):
             "Invalid primary_key: primary_key should be a boolean"
         )
 
-    def __sqltype__(self, remove_auto=False):
+    def __sqltype__(self, sqltype, remove_auto=False):
         if remove_auto:
             return "INTEGER"
-        else: # AUTOINCREMENT Deprecated (since we're using sqlite only)
-            return "INTEGER"
+        else:
+            if sqltype == 'MySQL':
+                return "INTEGER AUTO_INCREMENT"
+            elif sqltype == 'SQLite':
+                return "INTEGER"
 
 class DateField(Field):
     def __init__(self, auto_now:bool=False, auto_now_add:bool=False, default:datetime.date=None, null:bool=True, unique:bool=False, primary_key:bool=False):
@@ -313,13 +383,16 @@ class DateField(Field):
             "Invalid auto_now_add: auto_now_add should be a boolean value"
         )
 
-    def check_auto(self):
+    def check_auto(self, sqltype):
         if self.auto_now_add:
-            return " DEFAULT CURRENT_DATE"
+            if sqltype == 'MySQL':
+                return " DEFAULT CURRENT_TIMESTAMP"
+            elif sqltype == 'SQLite':
+                return " DEFAULT CURRENT_DATE"
         else: return ""
 
-    def __sqltype__(self):
-        return f"DATE{self.check_auto()}"
+    def __sqltype__(self, sqltype):
+        return f"{"DATETIME" if (self.auto_now_add and sqltype == 'MySQL') else "DATE"}{self.check_auto(sqltype)}"  # mysql doesn't support default current date like sqlite
 
 class TimeField(Field):
     def __init__(self, auto_now:bool=False, auto_now_add:bool=False, default:datetime.time=None, null:bool=True, unique:bool=False, primary_key:bool=False):
@@ -363,8 +436,11 @@ class TimeField(Field):
             return " DEFAULT CURRENT_TIME"
         else: return ""
 
-    def __sqltype__(self):
-        return f"TIME{self.check_auto()}"
+    def __sqltype__(self, sqltype):
+        if sqltype == 'MySQL':
+            return f"TIME{self.check_auto()}"
+        elif sqltype == 'SQLite':  # sqlite doesn't support TIME fields by default (using TEXT instead)
+            return f"TEXT{self.check_auto()}"
 
 class DateTimeField(Field):
     def __init__(self, auto_now:bool=False, auto_now_add:bool=False, default:datetime.datetime=None, null:bool=True, unique:bool=False, primary_key:bool=False):
@@ -408,8 +484,11 @@ class DateTimeField(Field):
             return " DEFAULT CURRENT_TIMESTAMP"
         else: return ""
 
-    def __sqltype__(self):
-        return f"DATETIME{self.check_auto()}"
+    def __sqltype__(self, sqltype):
+        if sqltype == 'MySQL':
+            return f"DATETIME{self.check_auto()}"
+        elif sqltype == 'SQLite':  # sqlite doesn't support TIME fields by default (using TEXT instead)
+            return f"TEXT{self.check_auto()}"
 
 class ForeignKey(Field):
     def __init__(self, to_table:Model, on_delete:OnDelete=CASCADE, default=None, null:bool=True, unique:bool=False):
@@ -433,7 +512,7 @@ class ForeignKey(Field):
         if isinstance(to_table, str):
             self.REFER = to_table
         else:
-            if to_table.__base__ in (Model, AuthorizedUser):
+            if to_table.__base__ in (Model, AuthenticatedUser):
                 self.to_table = to_table
             else: raise TypeError(
                 "Invalid to_table: to_table should be a Model"
@@ -446,7 +525,7 @@ class ForeignKey(Field):
 
     def resolve_string_reference(self, models_instances):
         to_table = models_instances[self.REFER]
-        if to_table.__class__.__base__ in (Model, AuthorizedUser):
+        if to_table.__class__.__base__ in (Model, AuthenticatedUser):
             self.to_table = to_table.__class__
         else: raise TypeError(
             "Invalid to_table: to_table should be a Model"
@@ -467,7 +546,7 @@ class OneToOneField(Field):
         else:
             self.default = default
             self._default = True
-        if to_table.__base__ in (Model, AuthorizedUser):
+        if to_table.__base__ in (Model, AuthenticatedUser):
             self.to_table = to_table
         else: raise TypeError(
             "Invalid to_table: to_table should be a Model"
@@ -495,7 +574,7 @@ class ManyToManyField(Field):
         else:
             self.default = default
             self._default = True
-        if to_table.__base__ in (Model, AuthorizedUser):
+        if to_table.__base__ in (Model, AuthenticatedUser):
             self.to_table = to_table
         else: raise TypeError(
             "Invalid to_table: to_table should be a Model"

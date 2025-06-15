@@ -1,13 +1,15 @@
 from socket import *
-import pickle
+import json
+import pathlib
 import traceback
 import threading
 import time
+import sys
 
 def content_length(num, padding=5):
     return ("0"*(padding-len(str(num)))+str(num)).encode()
 
-class ConnectionHandler:
+class ConnectionInterface:
     def receive_package(self, buffer_size_limit:int=65536, timeout:int=120, sock=None):
         request_content = b''
         if not sock: sock = self.main_sock
@@ -40,12 +42,9 @@ class ConnectionHandler:
         try:
             view, serialized_data = request.split(b"|", 1)
             view = view.decode()
-            data = pickle.loads(serialized_data)
+            data = json.loads(serialized_data)
             if view in self.mapping:
-                self.main_thread.queue.put((
-                    self.mapping[view],
-                    (data,)
-                ))
+                self.mapping[view](**data)
             else:
                 print(f'ReverseRequestError: function "{view}" not mapped')
         except Exception as e:
@@ -81,7 +80,11 @@ class ConnectionHandler:
     def receiver(self):
         while True:
             if not self.main_sock:
-                self.establish_connection()
+                try:
+                    self.establish_connection()
+                except KeyboardInterrupt:
+                    print("[Send-Request] KeyboardInterrupt detected; exiting gracefully...")
+                    sys.exit(0)
             try:
                 while True:
                     request = self.receive_package()
@@ -98,41 +101,55 @@ class ConnectionHandler:
     def recv_response(self, sock):
         try:
             data = self.receive_package(sock=sock)
-            sessionid, serialized_payload = data.split(b'|', 1)
-            return sessionid.decode('utf-8'), pickle.loads(serialized_payload)
+            if data:
+                sessionid, serialized_payload = data.split(b'|', 1)
+                return sessionid.decode('utf-8'), json.loads(serialized_payload)
+            else:
+                print("- Server connection closed")
+                return self.sessionid, None
         except:
             traceback.print_exc()
 
-    def send_request(self, view, data=b''):
+    def send_request(self, view_name, payload=''):
         try:
-            serialized_data = pickle.dumps(data)
-            message = f"{view}|{self.sessionid}|".encode()+serialized_data
+            serialized_data = json.dumps(payload).encode('utf-8')
+            message = f"{view_name}|{self.sessionid}|".encode()+serialized_data
             sock = self.establish_connection(dump=True)
             sock.send(content_length(len(message))+message)
             self.sessionid, payload = self.recv_response(sock)
             sock.close()
             return payload
-        except:
+        except KeyboardInterrupt:
+            print("[Send-Request] KeyboardInterrupt detected; exiting gracefully...")
+            sys.exit(0)
+        except Exception as e:
+            print(f"[Send-Request] Error: {str(e)}")
             traceback.print_exc()
             print("[Send-Request] Unexpected error")
 
     def __init__(self, host, port):
-        self.sessionid = ''
-        self.mapping = dict()
-        self.main_sock = None
-        if host == 'localhost':
-            self.host = gethostbyname(gethostname())
-        else:
-            self.host = host
-        self.port = port
-        self.response_ = None
-        # thread-safe calls for foreign functions
-        self.main_thread = threading.current_thread()
-        # establish connection
-        self.establish_connection()
-        # keep connection alive
-        thread = threading.Thread(target=self.receiver)
-        thread.start()
+        try:
+            self.sessionid = ''
+            self.mapping = dict()
+            self.main_sock = None
+            if host == 'localhost':
+                self.host = gethostbyname(gethostname())
+            else:
+                self.host = host
+            self.port = port
+            self.response_ = None
+            # establish connection
+            self.establish_connection()
+            # keep connection alive
+            thread = threading.Thread(target=self.receiver, daemon=True)
+            thread.start()
+        except KeyboardInterrupt:
+            print("[Send-Request] KeyboardInterrupt detected; exiting gracefully...")
+            sys.exit(0)
+        except Exception as e:
+            print(f"[ConnectionInterface] Error: {str(e)}")
+            traceback.print_exc()
+            print("[ConnectionInterface] Unexpected error during initialization")
 
 class CloudStorageConnector:
     def establish_connection(self):
@@ -144,6 +161,18 @@ class CloudStorageConnector:
             print("[Establish_Connection] Failed to connect with the server; re-establish connection in one second")
             time.sleep(1)
             return self.establish_connection()
+
+    def upload_file(self, cloud_relative_path, file_path):
+        if pathlib.Path(file_path).exists():
+            sock = self.establish_connection()
+            with open(file_path, 'rb') as file:
+                message = f"{cloud_relative_path}|{'WRITE_FILE'}|{self.main_server_connection.sessionid}|".encode() + file.read()
+                sock.send(content_length(len(message), padding=10)+message)
+            response = sock.recv(1024).decode()
+            return response
+        else: raise FileNotFoundError(
+            f'[CloudStorageConnector] file "{file_path}" not found!'
+        )
 
     def recv_content(self, sock, content_length, buffer_size_limit=65536):
         content_length_count = 0
@@ -186,7 +215,7 @@ class CloudStorageConnector:
                         content_length_, file_data = chunk[:10], chunk[10:]
                         if content_length_.isdigit():
                             content_length_ = int(content_length_) - len(file_data)
-                            return pickle.loads(file_data + self.recv_content(sock, content_length_))
+                            return json.loads(file_data + self.recv_content(sock, content_length_))
                         else:
                             return False
                     else:
@@ -199,6 +228,17 @@ class CloudStorageConnector:
             traceback.print_exc()
             print("[Send-Request] Unexpected error")
 
-    def __init__(self, host, port):
+    def create_file(self, file_path): ...
+    def write_file(self, file_path): ...
+    def read_file(self, file_path): ...
+    def delete_file(self, file_path): ...
+
+    def create_directory(self, directory_path): ...
+    def delete_directory(self, directory_path): ...
+
+    def read_tree_directory(self, tree_path): ...
+
+    def __init__(self, host, port, main_server_connection:ConnectionInterface):
+        self.main_server_connection = main_server_connection
         self.host = host
         self.port = port
