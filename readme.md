@@ -1,3 +1,5 @@
+# Fluxon
+
 ## 🚧 This project is currently in alpha.
 
 It is still under active development and not ready for production use.
@@ -7,7 +9,7 @@ Please do not clone, fork, or use this project in production just yet — unless
 
 A stable release will be announced once the project matures.
 
-# Fluxon
+---
 
 Fluxon is a lightweight Python-based general-purpose network engine. It offers secure communication, session handling, various server architectures and setups, and high-level database management making it an excellent choice for building server-side applications.
 
