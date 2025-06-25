@@ -64,7 +64,7 @@ async def main():
 
 asyncio.run(main())
 
-# results from the same hardware (my local machine)
+# all results are from (11th Gen Intel(R) Core i7 2.80 GHz | 16 GB of RAM)
 
 # Starting benchmarks...
 # Django Benchmark:
