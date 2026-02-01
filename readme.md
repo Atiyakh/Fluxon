@@ -11,7 +11,7 @@ A stable release will be announced once the project matures.
 
 ---
 
-Fluxon is a lightweight Python-based general-purpose network engine. It offers secure communication, session handling, various server architectures and setups, and high-level database management making it an excellent choice for building server-side applications.
+Fluxon is a lightweight Python-based general-purpose network engine. It offers secure communication, session handling, various server architectures and setups, and high-level database management making it an excellent choice for building server-side applications. _(Ongoing work includes evaluating multiple models and Rust-based components to further accelerate endpoint performance.)_
 
 I built Fluxon because I wanted a framework that combined Flask’s simplicity with Twisted’s power—but without the boilerplate. Along the way, I stumbled into designing a custom RPC system, a role-based cloud storage engine, and an async ORM. I love CS, and I absolutely love to carve things up and see how they work on the inside (I have done unspeakable things to Django's docs about ORM and CURD operations to pull this off), so here we are, no more magic boxes, no more libraries and dependencies. I built that from scratch because I was curious, and because I wanted to learn. I introduce FLUXON 🎉
 
